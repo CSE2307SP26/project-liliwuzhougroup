@@ -2,10 +2,10 @@
 
 ## Team Members:
 
-* 
-* 
-* 
-* 
+* John Li
+* Jack Zhou
+* Nick Wu
+* Kevin Li
 
 ## User stories
 
