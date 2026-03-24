@@ -20,6 +20,7 @@ public class MainMenu {
         
         System.out.println("1. Make a deposit");
         System.out.println("2. Exit the app");
+        // System.out.println("3. Collect fee from account"); add
 
     }
 

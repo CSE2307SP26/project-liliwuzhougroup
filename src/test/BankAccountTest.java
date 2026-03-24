@@ -23,7 +23,16 @@ public class BankAccountTest {
             testAccount.deposit(-50);
             fail();
         } catch (IllegalArgumentException e) {
-            //do nothing, test passes
+            // do nothing, test passes
         }
+    }
+
+    //added test for collect fee method
+    @Test
+    public void testCollectFee() {
+        BankAccount account = new BankAccount();
+        account.deposit(100.0);
+        account.collectFee(10.0);
+        assertEquals(90.0, account.getBalance(), 0.001);
     }
 }

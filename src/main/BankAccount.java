@@ -16,6 +16,15 @@ public class BankAccount {
         }
     }
 
+    //collect fee from the account, this will be used by the bank to collect fees for transactions
+    public void collectFee(double feeAmount) {
+    if (feeAmount > 0) {
+        this.balance -= feeAmount;
+    } else {
+        throw new IllegalArgumentException();
+    }
+}
+
     public double getBalance() {
         return this.balance;
     }
