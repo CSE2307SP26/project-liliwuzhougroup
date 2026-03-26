@@ -8,8 +8,4 @@ public class CreateAccount{
         BankAccount account = new BankAccount();
         accounts.add(account);
     }
-    public ArrayList<BankAccount>createAndReturnAccounts(ArrayList<BankAccount>accounts, BankAccount account){
-        accounts.add(account);
-        return accounts;
-    }
 }

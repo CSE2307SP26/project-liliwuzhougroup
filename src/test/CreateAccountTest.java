@@ -33,17 +33,4 @@ public class CreateAccountTest {
         assertEquals(1, accounts.size());
         assertSame(account, accounts.get(0));
     }
-
-    @Test
-    public void testCreateAndReturnAccounts() {
-        CreateAccount ca = new CreateAccount();
-        ArrayList<BankAccount> accounts = new ArrayList<>();
-        BankAccount account = new BankAccount();
-
-        ArrayList<BankAccount> result = ca.createAndReturnAccounts(accounts, account);
-
-        assertSame(accounts, result);
-        assertEquals(1, result.size());
-        assertSame(account, result.get(0));
-    }
 }
