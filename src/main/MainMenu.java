@@ -20,7 +20,8 @@ public class MainMenu {
         System.out.println("1. Make a deposit");
         System.out.println("2. Check transaction history");
         System.out.println("3. Make a withdrawal");
-        System.out.println("4. Exit the app");
+        System.out.println("4. Check balance");
+        System.out.println("5. Exit the app");
     }
 
     public int getUserSelection(int max) {
@@ -44,6 +45,9 @@ public class MainMenu {
                 performWithdrawal();
                 break;
             case 4:
+                displayBalance();
+                break;
+            case 5:
                 System.out.println("Thank you for using the 237 Bank App!");
                 break;
         }
@@ -86,6 +90,10 @@ public class MainMenu {
             selection = getUserSelection(MAX_SELECTION);
             processInput(selection);
         }
+    }
+
+    public void displayBalance() {
+        System.out.println("Your current balance is: " + userAccount.getBalance());
     }
 
     public static void main(String[] args) {
