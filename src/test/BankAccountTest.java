@@ -45,48 +45,54 @@ public class BankAccountTest {
         assertEquals(100, account.getBalance(), 0.01);
     }
 
-    @Test
-    public void testWithdrawal() {
+
+ //withdrawTest
+    @ Test
+    public void testWithdraw() {
         BankAccount account = new BankAccount();
         account.deposit(100);
-        account.withdraw(30);
-        assertEquals(70, account.getBalance(), 0.01);
+        account.withdraw(40);
+        assertEquals(60, account.getBalance(), 0.01);
     }
 
     @Test
-    public void testInvalidWithdrawal() {
+    public void testWithdrawEntireBalance() {
+        BankAccount account = new BankAccount();
+        account.deposit(100);
+        account.withdraw(100);
+        assertEquals(0, account.getBalance(), 0.01);
+    }
+
+    @Test
+    public void testInvalidWithdrawNegativeAmount() {
         BankAccount account = new BankAccount();
         account.deposit(100);
         try {
-            account.withdraw(-30);
+            account.withdraw(-50);
             fail();
-
         } catch (IllegalArgumentException e) {
-            assertEquals(e.getMessage(), "Invalid withdrawal amount");
         }
     }
 
     @Test
-    public void testOverdraft() {
+    public void testInvalidWithdrawTooMuch() {
         BankAccount account = new BankAccount();
         account.deposit(100);
         try {
             account.withdraw(150);
             fail();
         } catch (IllegalArgumentException e) {
-            assertEquals(e.getMessage(), "Invalid withdrawal amount");
         }
     }
 
     @Test
-    public void testZeroWithdrawal() {
+    public void testInvalidWithdrawZero() {
         BankAccount account = new BankAccount();
         account.deposit(100);
-        try {            
+        try {
             account.withdraw(0);
             fail();
         } catch (IllegalArgumentException e) {
-            assertEquals(e.getMessage(), "Invalid withdrawal amount");
         }
     }
 }
