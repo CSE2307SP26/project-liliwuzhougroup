@@ -28,9 +28,26 @@
 3. A bank customer should be able to set a password or PIN for account security.
 4. A bank administrator should be able to freeze or unfreeze a customer account.
 5. The system should log all transactions for auditing purposes.
+6. The bank should be able have a list of account associated with a customer. 
+
+## What user stories were completed in this iteration?
+1. A bank customer should be able to withdraw from an account. 
+2. A bank customer should be able to check their account balance. 
+3. A bank customer should be able to view their transaction history for an account. 
+4. A bank customer should be able to create an additional account with the bank. 
+5. A bank customer should be able to close an existing account.
+6. A bank customer should be able to transfer money from one account to another. 
+7. A bank adminstrator should be able to collect fees from existing accounts when necessary.
+8. A bank adminstrator should be able to add an interest payment to an existing account when necessary.
+
+
 
 ## Is there anything that you implemented but doesn't currently work?
-* At this point, the main features implemented for this iteration are working. The only issue we ran into was a merge conflict caused by renaming a file, but that is a GitHub integration issue rather than a problem with the banking functionality itself.
+* All functionalities work properly, however, we may need to create a class called bank to host open and close account logic. 
+
 
 ## What commands are needed to compile and run your code from the command line?
-* To compile and run my code from the command line, use javac src/main/*.java to compile the Java files and then use java -cp src main.MainMenu to start the application, or simply run ./runApp.sh after making the script executable with chmod +x runApp.sh.
+```bash
+chmod +x runApp.sh
+./runApp.sh
+```
