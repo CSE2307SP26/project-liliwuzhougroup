@@ -19,6 +19,9 @@
 8. A bank adminstrator should be able to collect fees from existing accounts when necessary.
 9. A bank adminstrator should be able to add an interest payment to an existing account when necessary.
 
+## What user stories were completed in this iteration?
+* In this iteration, our team completed the user stories that allow a bank customer to withdraw from an account, check their account balance, view transaction history for an account, create an additional account with the bank, close an existing account, and transfer money from one account to another, as well as the user story that allows a bank administrator to add an interest payment to an existing account when necessary.
+
 ## What user stories do you intend to complete next iteration?
 1. A bank customer should be able to update their personal information 
 2. A bank customer should be able to receive notifications for important account activities.
@@ -26,7 +29,6 @@
 4. A bank administrator should be able to freeze or unfreeze a customer account.
 5. The system should log all transactions for auditing purposes.
 6. The bank should be able have a list of account associated with a customer. 
-
 
 ## What user stories were completed in this iteration?
 1. A bank customer should be able to withdraw from an account. 
@@ -49,3 +51,4 @@
 chmod +x runApp.sh
 ./runApp.sh
 ```
+
