@@ -62,6 +62,8 @@ public class MainMenu {
     public void displayTransactionHistory() {
         System.out.println("Transaction History:");
         System.out.println(userAccount.getTransactionHistory());
+    }
+    
     public void performWithdrawal() {
         double withdrawAmount = -1;
         while (withdrawAmount <= 0) {

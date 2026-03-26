@@ -25,14 +25,14 @@ public class BankAccount {
 
     public String getTransactionHistory() {
         return this.transactionHistory;
+    }
     //withdraw
     public void withdraw(double amount) {
-    if (amount <= 0) {
-        throw new IllegalArgumentException("Withdrawal amount must be greater than 0.");
-    }
-    if (amount > balance) {
-        throw new IllegalArgumentException("You are overdrafting your account.");
-    }
-    balance -= amount;
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Withdrawal amount must be greater than 0.");
+        }if (amount > balance) {
+            throw new IllegalArgumentException("You are overdrafting your account.");
+        }
+        balance -= amount;
     }
 }

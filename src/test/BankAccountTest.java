@@ -32,6 +32,7 @@ public class BankAccountTest {
         BankAccount account = new BankAccount();
         assertEquals(0, account.getBalance(), 0.01);
     }
+
     @Test
     public void testInitialBalance() {
         BankAccount account = new BankAccount();
@@ -65,6 +66,7 @@ public class BankAccountTest {
     account.deposit(100);
     account.deposit(50);
     assertEquals("Deposited: 100.0\nDeposited: 50.0\n", account.getTransactionHistory());
+    }
 
 
  //withdrawTest
