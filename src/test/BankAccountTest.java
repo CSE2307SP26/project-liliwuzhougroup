@@ -4,6 +4,7 @@ import main.BankAccount;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
@@ -27,12 +28,18 @@ public class BankAccountTest {
         }
     }
 
-    //added test for collect fee method
+    // added test for collect fee method
     @Test
     public void testCollectFee() {
         BankAccount account = new BankAccount();
         account.deposit(100.0);
         account.collectFee(10.0);
         assertEquals(90.0, account.getBalance(), 0.001);
+    }
+
+    @Test
+    public void testInvalidCollectFee() {
+        BankAccount account = new BankAccount();
+        assertThrows(IllegalArgumentException.class, () -> account.collectFee(-10.0));
     }
 }
