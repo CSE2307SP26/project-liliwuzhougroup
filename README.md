@@ -19,6 +19,9 @@
 8. A bank adminstrator should be able to collect fees from existing accounts when necessary.
 9. A bank adminstrator should be able to add an interest payment to an existing account when necessary.
 
+## What user stories were completed in this iteration?
+* In this iteration, our team completed the user stories that allow a bank customer to withdraw from an account, check their account balance, view transaction history for an account, create an additional account with the bank, close an existing account, and transfer money from one account to another, as well as the user story that allows a bank administrator to add an interest payment to an existing account when necessary.
+
 ## What user stories do you intend to complete next iteration?
 1. A bank customer should be able to update their personal information 
 2. A bank customer should be able to receive notifications for important account activities.
@@ -26,21 +29,8 @@
 4. A bank administrator should be able to freeze or unfreeze a customer account.
 5. The system should log all transactions for auditing purposes.
 
-
 ## Is there anything that you implemented but doesn't currently work?
+* At this point, the main features implemented for this iteration are working. The only issue we ran into was a merge conflict caused by renaming a file, but that is a GitHub integration issue rather than a problem with the banking functionality itself.
 
 ## What commands are needed to compile and run your code from the command line?
-
-## What user stories were completed in this iteration?
-* Kevin Li: In this iteration, I completed the user story that allows a bank customer to make a withdrawal from an account. I also completed the user story that allows a bank customer to view transaction history for an account. In addition, I updated the menu interface so users can access the transaction history feature from the app.
-
-
-
-## Is there anything that you implemented but doesn't currently work?
-* All functionalities work properly, however, we may need to create a class called bank to host open and close account logic. 
-
-## What user stories do you intend to complete next iteration?
-```bash
-chmod +x runApp.sh
-./runApp.sh
-```
+* To compile and run my code from the command line, use javac src/main/*.java to compile the Java files and then use java -cp src main.MainMenu to start the application, or simply run ./runApp.sh after making the script executable with chmod +x runApp.sh.
