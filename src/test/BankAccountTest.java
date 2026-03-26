@@ -4,8 +4,7 @@ import main.BankAccount;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 public class BankAccountTest {
 
@@ -25,5 +24,23 @@ public class BankAccountTest {
         } catch (IllegalArgumentException e) {
             //do nothing, test passes
         }
+    }
+
+    @Test
+    public void testCreateAccount() {
+        BankAccount account = new BankAccount();
+        assertEquals(0, account.getBalance(), 0.01);
+    }
+    @Test
+    public void testInitialBalance() {
+        BankAccount account = new BankAccount();
+        assertEquals(0, account.getBalance(), 0.01);
+    }
+
+    @Test
+    public void testBalanceAfterDeposit() {
+        BankAccount account = new BankAccount();
+        account.deposit(100);
+        assertEquals(100, account.getBalance(), 0.01);
     }
 }
