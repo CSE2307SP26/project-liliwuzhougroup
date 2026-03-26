@@ -19,7 +19,8 @@ public class MainMenu {
         System.out.println("Welcome to the 237 Bank App!");
         System.out.println("1. Make a deposit");
         System.out.println("2. Check transaction history");
-        System.out.println("3. Exit the app");
+        System.out.println("3. Make a withdrawal");
+        System.out.println("4. Exit the app");
     }
 
     public int getUserSelection(int max) {
@@ -40,6 +41,9 @@ public class MainMenu {
                 displayTransactionHistory();
                 break;
             case 3:
+                performWithdrawal();
+                break;
+            case 4:
                 System.out.println("Thank you for using the 237 Bank App!");
                 break;
         }
@@ -58,6 +62,19 @@ public class MainMenu {
     public void displayTransactionHistory() {
         System.out.println("Transaction History:");
         System.out.println(userAccount.getTransactionHistory());
+    public void performWithdrawal() {
+        double withdrawAmount = -1;
+        while (withdrawAmount <= 0) {
+            System.out.print("How much would you like to withdraw: ");
+            withdrawAmount = keyboardInput.nextDouble();
+        }
+
+        try {
+            userAccount.withdraw(withdrawAmount);
+            System.out.println("Withdrawal successful.");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Invalid withdrawal. Please make sure the amount is greater than 0 and does not exceed your balance.");
+        }
     }
 
     public void run() {
