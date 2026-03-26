@@ -18,8 +18,9 @@ public class MainMenu {
     public void displayOptions() {
         System.out.println("Welcome to the 237 Bank App!");
         System.out.println("1. Make a deposit");
-        System.out.println("2. Make a withdrawal");
-        System.out.println("3. Exit the app");
+        System.out.println("2. Check transaction history");
+        System.out.println("3. Make a withdrawal");
+        System.out.println("4. Exit the app");
     }
 
     public int getUserSelection(int max) {
@@ -37,9 +38,12 @@ public class MainMenu {
                 performDeposit();
                 break;
             case 2:
-                performWithdrawal();
+                displayTransactionHistory();
                 break;
             case 3:
+                performWithdrawal();
+                break;
+            case 4:
                 System.out.println("Thank you for using the 237 Bank App!");
                 break;
         }
@@ -55,6 +59,9 @@ public class MainMenu {
         System.out.println("Deposit successful.");
     }
 
+    public void displayTransactionHistory() {
+        System.out.println("Transaction History:");
+        System.out.println(userAccount.getTransactionHistory());
     public void performWithdrawal() {
         double withdrawAmount = -1;
         while (withdrawAmount <= 0) {
