@@ -134,4 +134,18 @@ public class BankAccountTest {
         } catch (IllegalArgumentException e) {
         }
     }
+    @Test
+    public void testAddInterest() {
+        BankAccount account = new BankAccount();
+        account.deposit(100.0);
+        account.addInterest(10.0);
+        assertEquals(110.0, account.getBalance(), 0.001);
+    }
+
+    @Test
+    public void testInvalidAddInterest() {
+        BankAccount account = new BankAccount();
+        assertThrows(IllegalArgumentException.class, () -> account.addInterest(-10.0));
+    }
 }
+

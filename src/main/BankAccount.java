@@ -18,6 +18,14 @@ public class BankAccount {
             throw new IllegalArgumentException();
         }
     }
+    
+    public void addInterest(double interestAmount) {
+        if (interestAmount > 0) {
+            this.balance += interestAmount;
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
 
     //collect fee from the account, this will be used by the bank to collect fees for transactions
     public void collectFee(double feeAmount) {
