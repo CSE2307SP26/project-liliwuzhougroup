@@ -15,6 +15,14 @@ public class BankAccount {
             throw new IllegalArgumentException();
         }
     }
+    
+    public void addInterest(double interestAmount) {
+        if (interestAmount > 0) {
+            this.balance += interestAmount;
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
 
     public double getBalance() {
         return this.balance;
