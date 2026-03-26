@@ -30,5 +30,5 @@
 ## Is there anything that you implemented but doesn't currently work?
 
 ## What commands are needed to compile and run your code from the command line?
-javac *.java
-java Main
+javac project/*.java
+java project.Main
