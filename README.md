@@ -25,21 +25,26 @@
 3. A bank customer should be able to set a password or PIN for account security.
 4. A bank administrator should be able to freeze or unfreeze a customer account.
 5. The system should log all transactions for auditing purposes.
+6. The bank should be able have a list of account associated with a customer. 
 
-
-## Is there anything that you implemented but doesn't currently work?
-
-## What commands are needed to compile and run your code from the command line?
 
 ## What user stories were completed in this iteration?
-* Kevin Li: In this iteration, I completed the user story that allows a bank customer to make a withdrawal from an account. I also completed the user story that allows a bank customer to view transaction history for an account. In addition, I updated the menu interface so users can access the transaction history feature from the app.
+1. A bank customer should be able to withdraw from an account. 
+2. A bank customer should be able to check their account balance. 
+3. A bank customer should be able to view their transaction history for an account. 
+4. A bank customer should be able to create an additional account with the bank. 
+5. A bank customer should be able to close an existing account.
+6. A bank customer should be able to transfer money from one account to another. 
+7. A bank adminstrator should be able to collect fees from existing accounts when necessary.
+8. A bank adminstrator should be able to add an interest payment to an existing account when necessary.
 
 
 
 ## Is there anything that you implemented but doesn't currently work?
 * All functionalities work properly, however, we may need to create a class called bank to host open and close account logic. 
 
-## What user stories do you intend to complete next iteration?
+
+## What commands are needed to compile and run your code from the command line?
 ```bash
 chmod +x runApp.sh
 ./runApp.sh
