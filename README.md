@@ -30,5 +30,17 @@
 ## Is there anything that you implemented but doesn't currently work?
 
 ## What commands are needed to compile and run your code from the command line?
-javac project/*.java
-java project.Main
+
+## What user stories were completed in this iteration?
+* Kevin Li: In this iteration, I completed the user story that allows a bank customer to make a withdrawal from an account. I also completed the user story that allows a bank customer to view transaction history for an account. In addition, I updated the menu interface so users can access the transaction history feature from the app.
+
+
+
+## Is there anything that you implemented but doesn't currently work?
+* All functionalities work properly, however, we may need to create a class called bank to host open and close account logic. 
+
+## What user stories do you intend to complete next iteration?
+```bash
+chmod +x runApp.sh
+./runApp.sh
+```
