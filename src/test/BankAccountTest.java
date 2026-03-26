@@ -43,4 +43,26 @@ public class BankAccountTest {
         account.deposit(100);
         assertEquals(100, account.getBalance(), 0.01);
     }
+    
+    //transaction-history test
+    @Test
+    public void testTransactionHistoryStartsEmpty() {
+    BankAccount account = new BankAccount();
+    assertEquals("", account.getTransactionHistory());
+    }
+
+    @Test
+    public void testTransactionHistoryAfterDeposit() {
+    BankAccount account = new BankAccount();
+    account.deposit(100);
+    assertEquals("Deposited: 100.0\n", account.getTransactionHistory());
+    }
+
+    @Test
+    public void testTransactionHistoryAfterMultipleDeposits() {
+    BankAccount account = new BankAccount();
+    account.deposit(100);
+    account.deposit(50);
+    assertEquals("Deposited: 100.0\nDeposited: 50.0\n", account.getTransactionHistory());
+    }
 }

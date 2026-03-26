@@ -4,10 +4,10 @@ import java.util.Scanner;
 
 public class MainMenu {
 
-    private static final int EXIT_SELECTION = 2;
-	private static final int MAX_SELECTION = 4;
+    private static final int EXIT_SELECTION = 3;
+    private static final int MAX_SELECTION = 3;
 
-	private BankAccount userAccount;
+    private BankAccount userAccount;
     private Scanner keyboardInput;
 
     public MainMenu() {
@@ -17,17 +17,14 @@ public class MainMenu {
 
     public void displayOptions() {
         System.out.println("Welcome to the 237 Bank App!");
-        
         System.out.println("1. Make a deposit");
-        System.out.println("2. Exit the app");
-        System.out.println("3. Check balance");
-        System.out.println("4. Create new account");
-
+        System.out.println("2. Check transaction history");
+        System.out.println("3. Exit the app");
     }
 
     public int getUserSelection(int max) {
         int selection = -1;
-        while(selection < 1 || selection > max) {
+        while (selection < 1 || selection > max) {
             System.out.print("Please make a selection: ");
             selection = keyboardInput.nextInt();
         }
@@ -39,28 +36,33 @@ public class MainMenu {
             case 1:
                 performDeposit();
                 break;
-            case 3:
-                System.out.println("Your current balance is: " + userAccount.getBalance());
+            case 2:
+                displayTransactionHistory();
                 break;
-            case 4:
-                userAccount = new BankAccount();
-                System.out.println("New account created.");
+            case 3:
+                System.out.println("Thank you for using the 237 Bank App!");
                 break;
         }
     }
 
     public void performDeposit() {
         double depositAmount = -1;
-        while(depositAmount < 0) {
+        while (depositAmount <= 0) {
             System.out.print("How much would you like to deposit: ");
-            depositAmount = keyboardInput.nextInt();
+            depositAmount = keyboardInput.nextDouble();
         }
         userAccount.deposit(depositAmount);
+        System.out.println("Deposit successful.");
+    }
+
+    public void displayTransactionHistory() {
+        System.out.println("Transaction History:");
+        System.out.println(userAccount.getTransactionHistory());
     }
 
     public void run() {
         int selection = -1;
-        while(selection != EXIT_SELECTION) {
+        while (selection != EXIT_SELECTION) {
             displayOptions();
             selection = getUserSelection(MAX_SELECTION);
             processInput(selection);
@@ -71,5 +73,4 @@ public class MainMenu {
         MainMenu bankApp = new MainMenu();
         bankApp.run();
     }
-
 }
