@@ -20,7 +20,15 @@
 9. A bank adminstrator should be able to add an interest payment to an existing account when necessary.
 
 ## What user stories do you intend to complete next iteration?
+1. A bank customer should be able to update their personal information 
+2. A bank customer should be able to receive notifications for important account activities.
+3. A bank customer should be able to set a password or PIN for account security.
+4. A bank administrator should be able to freeze or unfreeze a customer account.
+5. The system should log all transactions for auditing purposes.
+
 
 ## Is there anything that you implemented but doesn't currently work?
 
 ## What commands are needed to compile and run your code from the command line?
+javac *.java
+java Main
