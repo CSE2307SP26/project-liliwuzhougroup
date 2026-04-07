@@ -64,4 +64,18 @@ public class BankAccount implements Serializable {
         balance -= amount;
         this.transactionHistory += "Withdrew: " + amount + "\n";
     }
+
+    public void transferMoney(BankAccount targetAccount, double amount) {
+        if (targetAccount == null) {
+            throw new IllegalArgumentException("Source and target accounts cannot be null.");
+        }
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Transfer amount must be positive.");
+        }
+        if (this.balance < amount) {
+            throw new IllegalArgumentException("Insufficient funds in source account.");
+        }
+        this.withdraw(amount);
+        targetAccount.deposit(amount);
+    }
 }

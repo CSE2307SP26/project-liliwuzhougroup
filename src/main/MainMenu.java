@@ -11,7 +11,6 @@ public class MainMenu {
     private final Scanner keyboardInput;
     private final Customer customer;
     private final Bank bank;
-    private final TransferMoney transferMoney;
 
     public MainMenu() {
         this.keyboardInput = new Scanner(System.in);
@@ -22,7 +21,6 @@ public class MainMenu {
         } else {
             this.customer = this.bank.getCustomers().get(0);
         }
-        this.transferMoney = new TransferMoney();
     }
 
     public void displayOptions() {
@@ -155,7 +153,7 @@ public class MainMenu {
         double amount = readPositiveAmount("How much would you like to transfer: ");
 
         try {
-            transferMoney.transferMoney(sourceAccount, targetAccount, amount);
+            sourceAccount.transferMoney(targetAccount, amount);
             System.out.println("Transfer successful.");
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());

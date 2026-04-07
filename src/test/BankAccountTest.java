@@ -154,5 +154,78 @@ public class BankAccountTest {
             // expected
         }
     }
+
+    @Test
+    public void testTransferMoney() {
+        BankAccount sourceAccount = new BankAccount();
+        BankAccount targetAccount = new BankAccount();
+        sourceAccount.deposit(100);
+        sourceAccount.transferMoney(targetAccount, 50);
+        assertEquals(50, sourceAccount.getBalance(), 0.01);
+        assertEquals(50, targetAccount.getBalance(), 0.01);
+    }
+
+    @Test
+    public void testInvalidTransfer() {
+        BankAccount sourceAccount = new BankAccount();
+        BankAccount targetAccount = new BankAccount();
+        sourceAccount.deposit(100);
+        try {
+            sourceAccount.transferMoney(targetAccount, -50);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals(e.getMessage(), "Transfer amount must be positive.");
+        }
+    }
+
+    @Test
+    public void testInsufficientFunds() {
+        BankAccount sourceAccount = new BankAccount();
+        BankAccount targetAccount = new BankAccount();
+        sourceAccount.deposit(100);
+        try {
+            sourceAccount.transferMoney(targetAccount, 150);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals(e.getMessage(), "Insufficient funds in source account.");
+        }
+    }
+
+    @Test
+    public void testNullAccounts() {
+        BankAccount sourceAccount = new BankAccount();
+        sourceAccount.deposit(100);
+        try {
+            sourceAccount.transferMoney(null, 50);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals(e.getMessage(), "Source and target accounts cannot be null.");
+        }
+    }
+
+    @Test
+    public void testSameAccountTransfer() {
+        BankAccount sourceAccount = new BankAccount();
+        sourceAccount.deposit(100);
+        try {
+            sourceAccount.transferMoney(sourceAccount, 50);
+            sourceAccount.transferMoney(sourceAccount, 50);
+        } catch (IllegalArgumentException e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void testZeroAmountTransfer() {
+        BankAccount sourceAccount = new BankAccount();
+        BankAccount targetAccount = new BankAccount();
+        sourceAccount.deposit(100);
+        try {
+            sourceAccount.transferMoney(targetAccount, 0);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals(e.getMessage(), "Transfer amount must be positive.");
+        }
+    }
 }
 
