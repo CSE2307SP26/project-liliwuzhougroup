@@ -1,11 +1,9 @@
 package test;
 
 import main.BankAccount;
-import main.CreateAccount;
 import org.junit.Test;
-import static org.junit.Assert.*;
-
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class BankAccountTest {
 
@@ -39,7 +37,12 @@ public class BankAccountTest {
     @Test
     public void testInvalidCollectFee() {
         BankAccount account = new BankAccount();
-        assertThrows(IllegalArgumentException.class, () -> account.collectFee(-10.0));
+        try {
+            account.collectFee(-10.0);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
     }
   
     @Test
@@ -84,8 +87,8 @@ public class BankAccountTest {
     }
 
 
- //withdrawTest
-    @ Test
+    //withdrawTest
+    @Test
     public void testWithdraw() {
         BankAccount account = new BankAccount();
         account.deposit(100);
@@ -144,7 +147,12 @@ public class BankAccountTest {
     @Test
     public void testInvalidAddInterest() {
         BankAccount account = new BankAccount();
-        assertThrows(IllegalArgumentException.class, () -> account.addInterest(-10.0));
+        try {
+            account.addInterest(-10.0);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
     }
 }
 
