@@ -39,9 +39,6 @@ public class Customer implements Serializable {
 
     private final String name;
     private final ArrayList<BankAccount> accounts;
-    private String address;
-    private String phoneNumber;
-    private String email;
     private String password;
     private String pin;
     private final ArrayList<RecurringPayment> recurringPayments;
@@ -77,16 +74,6 @@ public class Customer implements Serializable {
         return this.name;
     }
 
-    public String getAddress() {
-        return this.address;
-    }
-
-    public String getPhoneNumber() {
-        return this.phoneNumber;
-    }
-
-    public String getEmail() {
-        return this.email;
     public void setPassword(String password) {
         if (password == null || password.trim().isEmpty()) {
             throw new IllegalArgumentException("Password cannot be empty.");
@@ -119,16 +106,6 @@ public class Customer implements Serializable {
         return Collections.unmodifiableList(this.accounts);
     }
 
-    public void updatePersonalInformation(String address, String phoneNumber, String email) {
-        validatePersonalInfo(address, "Address");
-        validatePersonalInfo(phoneNumber, "Phone number");
-        validatePersonalInfo(email, "Email");
-
-        this.address = address;
-        this.phoneNumber = phoneNumber;
-        this.email = email;
-    }
-
     public BankAccount openAccount() {
         BankAccount account = new BankAccount();
         this.accounts.add(account);
@@ -152,10 +129,6 @@ public class Customer implements Serializable {
         this.accounts.remove(account);
     }
 
-    private void validatePersonalInfo(String value, String fieldName) {
-        if (value == null || value.trim().isEmpty()) {
-            throw new IllegalArgumentException(fieldName + " cannot be empty.");
-        }
     public void setupRecurringPayment(String description, int sourceIndex, int targetIndex,
                                       double amount, RecurringPayment.Frequency frequency) {
         if (description == null || description.trim().isEmpty()) {
