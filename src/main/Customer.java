@@ -10,6 +10,9 @@ public class Customer implements Serializable {
 
     private final String name;
     private final ArrayList<BankAccount> accounts;
+    private String address;
+    private String phoneNumber;
+    private String email;
 
     public Customer(String name) {
         this.name = name;
@@ -39,8 +42,30 @@ public class Customer implements Serializable {
         return this.name;
     }
 
+    public String getAddress() {
+        return this.address;
+    }
+
+    public String getPhoneNumber() {
+        return this.phoneNumber;
+    }
+
+    public String getEmail() {
+        return this.email;
+    }
+
     public List<BankAccount> getAccounts() {
         return Collections.unmodifiableList(this.accounts);
+    }
+
+    public void updatePersonalInformation(String address, String phoneNumber, String email) {
+        validatePersonalInfo(address, "Address");
+        validatePersonalInfo(phoneNumber, "Phone number");
+        validatePersonalInfo(email, "Email");
+
+        this.address = address;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
     }
 
     public BankAccount openAccount() {
@@ -64,5 +89,11 @@ public class Customer implements Serializable {
             throw new IllegalStateException("Cannot close account with non-zero balance.");
         }
         this.accounts.remove(account);
+    }
+
+    private void validatePersonalInfo(String value, String fieldName) {
+        if (value == null || value.trim().isEmpty()) {
+            throw new IllegalArgumentException(fieldName + " cannot be empty.");
+        }
     }
 }

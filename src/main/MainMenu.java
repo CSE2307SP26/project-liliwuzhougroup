@@ -5,8 +5,8 @@ import java.util.Scanner;
 
 public class MainMenu {
 
-    private static final int EXIT_SELECTION = 10;
-    private static final int MAX_SELECTION = 10;
+    private static final int EXIT_SELECTION = 11;
+    private static final int MAX_SELECTION = 11;
 
     private final Scanner keyboardInput;
     private final Customer customer;
@@ -34,7 +34,8 @@ public class MainMenu {
         System.out.println("7. Transfer money between your accounts");
         System.out.println("8. Admin: Collect fee");
         System.out.println("9. Admin: Add interest payment");
-        System.out.println("10. Exit the app");
+        System.out.println("10. Update personal information");
+        System.out.println("11. Exit the app");
     }
 
     public int getUserSelection(int max) {
@@ -81,10 +82,13 @@ public class MainMenu {
                     addInterest();
                     break;
                 case 10:
+                    updatePersonalInformation();
+                    break;
+                case 11:
                     System.out.println("Thank you for using the 237 Bank App!");
                     break;
             }
-        } catch (IllegalStateException e) {
+        } catch (IllegalStateException | IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }
     }
@@ -182,6 +186,16 @@ public class MainMenu {
         }
     }
 
+    public void updatePersonalInformation() {
+        keyboardInput.nextLine();
+        String address = readRequiredText("Enter your address: ");
+        String phoneNumber = readRequiredText("Enter your phone number: ");
+        String email = readRequiredText("Enter your email: ");
+
+        customer.updatePersonalInformation(address, phoneNumber, email);
+        System.out.println("Personal information updated successfully.");
+    }
+
     private BankAccount selectAccount(String action) {
         List<BankAccount> accounts = customer.getAccounts();
         if (accounts.isEmpty()) {
@@ -206,6 +220,15 @@ public class MainMenu {
             }
         }
         return amount;
+    }
+
+    private String readRequiredText(String prompt) {
+        String value = "";
+        while (value.trim().isEmpty()) {
+            System.out.print(prompt);
+            value = keyboardInput.nextLine();
+        }
+        return value.trim();
     }
 
     private void saveData() {
