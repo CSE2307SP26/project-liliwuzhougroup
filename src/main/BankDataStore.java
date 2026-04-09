@@ -37,6 +37,7 @@ public final class BankDataStore {
                 try {
                     reader.close();
                 } catch (IOException e) {
+                    // ignore close failures
                 }
             }
         }
@@ -61,7 +62,7 @@ public final class BankDataStore {
                 try {
                     writer.close();
                 } catch (IOException e) {
-                
+                    // ignore close failures
                 }
             }
         }
@@ -119,8 +120,6 @@ public final class BankDataStore {
     private static BankAccount parseAccount(String accountJson) {
         Double balance = extractDoubleByKey(accountJson, "balance");
         String transactionHistory = extractStringByKey(accountJson, "transactionHistory");
-        Boolean frozen = extractBooleanByKey(accountJson, "frozen");
-        Double maxWithdrawAmount = extractDoubleByKey(accountJson, "maxWithdrawAmount");
 
         if (balance == null) {
             return null;
@@ -128,14 +127,8 @@ public final class BankDataStore {
         if (transactionHistory == null) {
             transactionHistory = "";
         }
-        if (frozen == null) {
-            frozen = false;
-        }
-        if (maxWithdrawAmount == null || maxWithdrawAmount <= 0) {
-            maxWithdrawAmount = Double.MAX_VALUE;
-        }
-        return new BankAccount(balance.doubleValue(), transactionHistory, frozen.booleanValue(),
-                maxWithdrawAmount.doubleValue());
+
+        return new BankAccount(balance.doubleValue(), transactionHistory);
     }
 
     private static String buildBankJson(Bank bank) {
@@ -157,11 +150,7 @@ public final class BankDataStore {
                 builder.append("          \"balance\": ").append(account.getBalance()).append(",\n");
                 builder.append("          \"transactionHistory\": \"")
                         .append(escapeJson(account.getTransactionHistory()))
-                        .append("\",\n");
-
-                builder.append("          \"frozen\": ").append(account.isFrozen()).append(",\n");
-                builder.append("          \"maxWithdrawAmount\": ").append(account.getMaxWithdrawAmount()).append("\n");
-
+                        .append("\"\n");
                 builder.append("        }");
                 if (j < accounts.size() - 1) {
                     builder.append(",");
@@ -329,34 +318,6 @@ public final class BankDataStore {
         } catch (NumberFormatException e) {
             return null;
         }
-    }
-
-    // NEW: helper method to read true/false values like "frozen": true
-    private static Boolean extractBooleanByKey(String json, String key) {
-        String keyText = "\"" + key + "\"";
-        int keyIndex = json.indexOf(keyText);
-        if (keyIndex < 0) {
-            return null;
-        }
-
-        int colonIndex = json.indexOf(":", keyIndex);
-        if (colonIndex < 0) {
-            return null;
-        }
-
-        int start = colonIndex + 1;
-        while (start < json.length() && Character.isWhitespace(json.charAt(start))) {
-            start++;
-        }
-
-        if (json.startsWith("true", start)) {
-            return Boolean.TRUE;
-        }
-        if (json.startsWith("false", start)) {
-            return Boolean.FALSE;
-        }
-
-        return null;
     }
 
     private static String escapeJson(String value) {
