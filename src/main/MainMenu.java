@@ -6,7 +6,7 @@ import java.util.Scanner;
 public class MainMenu {
 
     private static final int EXIT_SELECTION = 10;
-    private static final int MAX_SELECTION = 10;
+    private static final int MAX_SELECTION = 11;
 
     private final Scanner keyboardInput;
     private final Customer customer;
@@ -35,6 +35,7 @@ public class MainMenu {
         System.out.println("8. Admin: Collect fee");
         System.out.println("9. Admin: Add interest payment");
         System.out.println("10. Exit the app");
+        System.out.println("11. Manage recurring payments");
     }
 
     public int getUserSelection(int max) {
@@ -82,6 +83,9 @@ public class MainMenu {
                     break;
                 case 10:
                     System.out.println("Thank you for using the 237 Bank App!");
+                    break;
+                case 11:
+                    manageRecurringPayments();
                     break;
             }
         } catch (IllegalStateException e) {
@@ -206,6 +210,10 @@ public class MainMenu {
             }
         }
         return amount;
+    }
+
+    public void manageRecurringPayments() {
+        new RecurringPaymentMenu(keyboardInput, customer).run();
     }
 
     private void saveData() {
