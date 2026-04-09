@@ -6,6 +6,8 @@ import main.Customer;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 public class BankTest {
 
@@ -69,5 +71,17 @@ public class BankTest {
         String bobHistory = bank.getCustomers().get(1).getAccounts().get(0).getTransactionHistory();
         assertEquals("Deposited: 100.0\n", aliceHistory);
         assertEquals("Deposited: 500.0\n", bobHistory);
+    }
+
+    @Test
+    public void testFreezeAndUnfreezeAccount() {
+        Bank bank = new Bank();
+        BankAccount account = new BankAccount();
+
+        bank.freezeAccount(account);
+        assertTrue(account.isFrozen());
+
+        bank.unfreezeAccount(account);
+        assertFalse(account.isFrozen());
     }
 }
