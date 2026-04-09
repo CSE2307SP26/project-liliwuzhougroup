@@ -1,6 +1,8 @@
 package main;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BankAccount implements Serializable {
 
@@ -8,15 +10,18 @@ public class BankAccount implements Serializable {
 
     private double balance;
     private String transactionHistory;
+    private ArrayList<Fee> fees;
 
     public BankAccount() {
         this.balance = 0;
         this.transactionHistory = "";
+        this.fees = new ArrayList<>();
     }
 
     public BankAccount(double balance, String transactionHistory) {
         this.balance = balance;
         this.transactionHistory = transactionHistory == null ? "" : transactionHistory;
+        this.fees = new ArrayList<>();
     }
 
     public void deposit(double amount) {
@@ -39,13 +44,13 @@ public class BankAccount implements Serializable {
 
     //collect fee from the account, this will be used by the bank to collect fees for transactions
     public void collectFee(double feeAmount) {
-    if (feeAmount > 0) {
-        this.balance -= feeAmount;
-        this.transactionHistory += "Fee collected: " + feeAmount + "\n";
-    } else {
-        throw new IllegalArgumentException();
+        if (feeAmount > 0) {
+            this.balance -= feeAmount;
+            this.transactionHistory += "Fee collected: " + feeAmount + "\n";
+        } else {
+            throw new IllegalArgumentException();
+        }
     }
-}
 
     public double getBalance() {
         return this.balance;
@@ -78,4 +83,17 @@ public class BankAccount implements Serializable {
         this.withdraw(amount);
         targetAccount.deposit(amount);
     }
+
+    public void createFee(Fee fee) {
+        if (fee == null) {
+            throw new IllegalArgumentException("Fee cannot be null.");
+        }
+        this.fees.add(fee);
+    }
+
+    public List<Fee> getRemainingFees() {
+        return new ArrayList<>(this.fees);
+    }
+
+
 }

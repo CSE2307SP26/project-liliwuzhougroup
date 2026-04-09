@@ -192,7 +192,17 @@ public class MainMenu {
             System.out.println((i + 1) + ". Account #" + (i + 1) + " (Balance: " + accounts.get(i).getBalance() + ")");
         }
         int selectedAccount = getUserSelection(accounts.size());
-        return accounts.get(selectedAccount - 1);
+        BankAccount account = accounts.get(selectedAccount - 1);
+        displayRemainingFees(account);
+        return account;
+    }
+
+    public void displayRemainingFees(BankAccount account) {
+        List<Fee> fees = account.getRemainingFees();
+        for (int i = 0; i < fees.size(); i++) {
+            Fee fee = fees.get(i);
+            System.out.println("You have " + fee.getAmount() + " due for " + fee.getDescription() + " on " + fee.getDueDate() + ".");
+        }
     }
 
     private double readPositiveAmount(String prompt) {
