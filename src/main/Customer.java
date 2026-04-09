@@ -5,29 +5,60 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+
+
 public class Customer implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    public static class RecurringPayment implements Serializable {
+        private static final long serialVersionUID = 1L;
+
+        public enum Frequency { DAILY, WEEKLY, MONTHLY }
+
+        final String description;
+        final int sourceAccountIndex;
+        final int targetAccountIndex;
+        final double amount;
+        final Frequency frequency;
+
+        public RecurringPayment(String description, int sourceIndex, int targetIndex,
+                                double amount, Frequency frequency) {
+            this.description = description;
+            this.sourceAccountIndex = sourceIndex;
+            this.targetAccountIndex = targetIndex;
+            this.amount = amount;
+            this.frequency = frequency;
+        }
+
+        @Override
+        public String toString() {
+            return description + " | $" + amount + " | " + frequency
+                    + " | Acct #" + (sourceAccountIndex + 1) + " -> #" + (targetAccountIndex + 1);
+        }
+    }
+
     private final String name;
     private final ArrayList<BankAccount> accounts;
-    private String password;
-    private String pin;
+    private final ArrayList<RecurringPayment> recurringPayments;
 
     public Customer(String name) {
         this.name = name;
         this.accounts = new ArrayList<>();
+        this.recurringPayments = new ArrayList<>();
         openAccount();
     }
 
     public Customer(String name, BankAccount account) {
         this.name = name;
         this.accounts = new ArrayList<>();
+        this.recurringPayments = new ArrayList<>();
         openAccount(account);
     }
 
     public Customer(String name, List<BankAccount> accounts) {
         this.name = name;
         this.accounts = new ArrayList<>();
+        this.recurringPayments = new ArrayList<>();
         if (accounts == null || accounts.isEmpty()) {
             openAccount();
             return;
@@ -66,5 +97,34 @@ public class Customer implements Serializable {
             throw new IllegalStateException("Cannot close account with non-zero balance.");
         }
         this.accounts.remove(account);
+    }
+
+    public void setupRecurringPayment(String description, int sourceIndex, int targetIndex,
+                                      double amount, RecurringPayment.Frequency frequency) {
+        if (description == null || description.trim().isEmpty()) {
+            throw new IllegalArgumentException("Description cannot be blank.");
+        }
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Amount must be greater than zero.");
+        }
+        if (sourceIndex < 0 || targetIndex < 0) {
+            throw new IllegalArgumentException("Account indices cannot be negative.");
+        }
+        recurringPayments.add(new RecurringPayment(description, sourceIndex, targetIndex, amount, frequency));
+    }
+
+    public List<RecurringPayment> getRecurringPayments() {
+        return Collections.unmodifiableList(recurringPayments);
+    }
+
+    public void processRecurringPayments() {
+        for (RecurringPayment payment : recurringPayments) {
+            accounts.get(payment.sourceAccountIndex).transferMoney(
+                    accounts.get(payment.targetAccountIndex), payment.amount);
+        }
+    }
+
+    public void cancelRecurringPayment(int index) {
+        recurringPayments.remove(index);
     }
 }
