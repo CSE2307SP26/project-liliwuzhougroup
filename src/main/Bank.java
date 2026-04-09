@@ -53,4 +53,24 @@ public class Bank implements Serializable {
         }
         account.unfreezeAccount();
     }
+
+    public String getAllCustomersHistory() {
+        StringBuilder historyBuilder = new StringBuilder();
+        for (int i = 0; i < customers.size(); i++) {
+            Customer customer = customers.get(i);
+            historyBuilder.append("Customer: ").append(customer.getName()).append("\n");
+            List<BankAccount> accounts = customer.getAccounts();
+            for (int j = 0; j < accounts.size(); j++) {
+                BankAccount account = accounts.get(j);
+                historyBuilder.append("  Account #").append(j + 1).append(":\n");
+                String history = account.getTransactionHistory();
+                if (history.isEmpty()) {
+                    historyBuilder.append("    No transactions yet.\n");
+                } else {
+                    historyBuilder.append("    ").append(history.replace("\n", "\n    ")).append("\n");
+                }
+            }
+        }
+        return historyBuilder.toString().trim();
+    }
 }
