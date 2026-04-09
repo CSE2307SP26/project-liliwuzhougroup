@@ -1,11 +1,14 @@
 package test;
 
 import main.BankAccount;
+import main.Fee;
 import org.junit.Test;
+import java.util.Date;
+import java.util.List;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 public class BankAccountTest {
 
@@ -228,6 +231,24 @@ public class BankAccountTest {
         } catch (IllegalArgumentException e) {
             assertEquals(e.getMessage(), "Transfer amount must be positive.");
         }
+    }
+    @Test
+    public void testGetRemainingFeesStartsEmpty() {
+        BankAccount account = new BankAccount();
+        List<Fee> fees = account.getRemainingFees();
+        assertTrue(fees.isEmpty());
+    }
+
+    @Test
+    public void testGetRemainingFeesAfterCreateFee() {
+        BankAccount account = new BankAccount();
+        Fee fee = new Fee(25.0, "Late fee", new Date(System.currentTimeMillis() + 86400000));
+        account.createFee(fee);
+
+        List<Fee> fees = account.getRemainingFees();
+        assertEquals(1, fees.size());
+        assertEquals(25.0, fees.get(0).getAmount(), 0.001);
+        assertEquals("Late fee", fees.get(0).getDescription());
     }
 
     // test for freeze and unfreeze account

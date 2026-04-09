@@ -1,6 +1,8 @@
 package main;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BankAccount implements Serializable {
 
@@ -8,12 +10,14 @@ public class BankAccount implements Serializable {
 
     private double balance;
     private String transactionHistory;
+    private ArrayList<Fee> fees;
     private boolean frozen;
     private double maxWithdrawAmount;
 
     public BankAccount() {
         this.balance = 0;
         this.transactionHistory = "";
+        this.fees = new ArrayList<>();
         this.frozen = false;
         this.maxWithdrawAmount = Double.MAX_VALUE;
     }
@@ -21,6 +25,7 @@ public class BankAccount implements Serializable {
     public BankAccount(double balance, String transactionHistory) {
         this.balance = balance;
         this.transactionHistory = transactionHistory == null ? "" : transactionHistory;
+        this.fees = new ArrayList<>();
         this.frozen = false;
         this.maxWithdrawAmount = Double.MAX_VALUE;
     }
@@ -28,6 +33,7 @@ public class BankAccount implements Serializable {
     public BankAccount(double balance, String transactionHistory, boolean frozen) {
         this.balance = balance;
         this.transactionHistory = transactionHistory == null ? "" : transactionHistory;
+        this.fees = new ArrayList<>();
         this.frozen = frozen;
         this.maxWithdrawAmount = Double.MAX_VALUE;
     }
@@ -35,6 +41,7 @@ public class BankAccount implements Serializable {
     public BankAccount(double balance, String transactionHistory, boolean frozen, double maxWithdrawAmount) {
         this.balance = balance;
         this.transactionHistory = transactionHistory == null ? "" : transactionHistory;
+        this.fees = new ArrayList<>();
         this.frozen = frozen;
         this.maxWithdrawAmount = maxWithdrawAmount <= 0 ? Double.MAX_VALUE : maxWithdrawAmount;
     }
@@ -42,6 +49,7 @@ public class BankAccount implements Serializable {
     public BankAccount(double balance, String transactionHistory, double maxWithdrawAmount) {
         this.balance = balance;
         this.transactionHistory = transactionHistory == null ? "" : transactionHistory;
+        this.fees = new ArrayList<>();
         this.frozen = false;
         if (maxWithdrawAmount <= 0) {
             this.maxWithdrawAmount = Double.MAX_VALUE;
@@ -155,6 +163,16 @@ public class BankAccount implements Serializable {
         targetAccount.deposit(amount);
     }
 
+    public void createFee(Fee fee) {
+        if (fee == null) {
+            throw new IllegalArgumentException("Fee cannot be null.");
+        }
+        this.fees.add(fee);
+    }
+
+    public List<Fee> getRemainingFees() {
+        return new ArrayList<>(this.fees);
+    }
     private void ensureAccountIsActive() {
         if (this.frozen) {
             throw new IllegalStateException("This account is frozen. Transactions are not allowed.");
