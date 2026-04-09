@@ -6,7 +6,7 @@ import java.util.Scanner;
 public class MainMenu {
 
     private static final int EXIT_SELECTION = 10;
-    private static final int MAX_SELECTION = 10;
+    private static final int MAX_SELECTION = 11;
 
     private final Scanner keyboardInput;
     private final Customer customer;
@@ -35,6 +35,7 @@ public class MainMenu {
         System.out.println("8. Admin: Collect fee");
         System.out.println("9. Admin: Add interest payment");
         System.out.println("10. Exit the app");
+        System.out.println("11. Admin: View all transactions for an account");
     }
 
     public int getUserSelection(int max) {
@@ -82,6 +83,9 @@ public class MainMenu {
                     break;
                 case 10:
                     System.out.println("Thank you for using the 237 Bank App!");
+                    break;
+                case 11:
+                    viewAdminTransactionHistory();
                     break;
             }
         } catch (IllegalStateException e) {
@@ -206,6 +210,30 @@ public class MainMenu {
             }
         }
         return amount;
+    }
+
+    public void viewAdminTransactionHistory() {
+        List<Customer> customers = bank.getCustomers();
+        if (customers.isEmpty()) {
+            System.out.println("No customers found.");
+            return;
+        }
+        System.out.println("Select a customer:");
+        for (int i = 0; i < customers.size(); i++) {
+            System.out.println((i + 1) + ". " + customers.get(i).getName());
+        }
+        Customer selected = customers.get(getUserSelection(customers.size()) - 1);
+
+        List<BankAccount> accounts = selected.getAccounts();
+        System.out.println("Select an account:");
+        for (int i = 0; i < accounts.size(); i++) {
+            System.out.println((i + 1) + ". Account #" + (i + 1) + " (Balance: " + accounts.get(i).getBalance() + ")");
+        }
+        BankAccount account = accounts.get(getUserSelection(accounts.size()) - 1);
+
+        String history = account.getTransactionHistory();
+        System.out.println("Transaction History:");
+        System.out.println(history.isEmpty() ? "No transactions yet." : history);
     }
 
     private void saveData() {
