@@ -5,8 +5,8 @@ import java.util.Scanner;
 
 public class MainMenu {
 
-    private static final int EXIT_SELECTION = 10;
-    private static final int MAX_SELECTION = 10;
+    private static final int EXIT_SELECTION = 11;
+    private static final int MAX_SELECTION = 11;
 
     private final Scanner keyboardInput;
     private final Customer customer;
@@ -34,7 +34,8 @@ public class MainMenu {
         System.out.println("7. Transfer money between your accounts");
         System.out.println("8. Admin: Collect fee");
         System.out.println("9. Admin: Add interest payment");
-        System.out.println("10. Exit the app");
+        System.out.println("10. Set password or PIN");
+        System.out.println("11. Exit the app");
     }
 
     public int getUserSelection(int max) {
@@ -81,10 +82,13 @@ public class MainMenu {
                     addInterest();
                     break;
                 case 10:
+                    setPasswordOrPin();
+                    break;
+                case 11:
                     System.out.println("Thank you for using the 237 Bank App!");
                     break;
             }
-        } catch (IllegalStateException e) {
+        } catch (IllegalStateException | IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }
     }
@@ -179,6 +183,26 @@ public class MainMenu {
             System.out.println("Interest added successfully.");
         } catch (IllegalArgumentException e) {
             System.out.println("Invalid interest amount.");
+        }
+    }
+
+    public void setPasswordOrPin() {
+        keyboardInput.nextLine();
+        System.out.println("1. Set password");
+        System.out.println("2. Set PIN");
+        int choice = getUserSelection(2);
+        keyboardInput.nextLine();
+
+        if (choice == 1) {
+            System.out.print("Enter your new password: ");
+            String password = keyboardInput.nextLine();
+            customer.setPassword(password);
+            System.out.println("Password set successfully.");
+        } else {
+            System.out.print("Enter your 4-digit PIN: ");
+            String pin = keyboardInput.nextLine();
+            customer.setPin(pin);
+            System.out.println("PIN set successfully.");
         }
     }
 

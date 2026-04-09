@@ -10,6 +10,8 @@ public class Customer implements Serializable {
 
     private final String name;
     private final ArrayList<BankAccount> accounts;
+    private String password;
+    private String pin;
 
     public Customer(String name) {
         this.name = name;
@@ -37,6 +39,34 @@ public class Customer implements Serializable {
 
     public String getName() {
         return this.name;
+    }
+
+    public void setPassword(String password) {
+        if (password == null || password.trim().isEmpty()) {
+            throw new IllegalArgumentException("Password cannot be empty.");
+        }
+        this.password = password;
+    }
+
+    public void setPin(String pin) {
+        if (pin == null || !pin.matches("\\d{4}")) {
+            throw new IllegalArgumentException("PIN must be exactly 4 digits.");
+        }
+        this.pin = pin;
+    }
+
+    public boolean verifyPassword(String password) {
+        if (this.password == null) {
+            return false;
+        }
+        return this.password.equals(password);
+    }
+
+    public boolean verifyPin(String pin) {
+        if (this.pin == null) {
+            return false;
+        }
+        return this.pin.equals(pin);
     }
 
     public List<BankAccount> getAccounts() {
