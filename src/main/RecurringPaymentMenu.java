@@ -56,8 +56,8 @@ public class RecurringPaymentMenu {
         double amount = readPositiveAmount("Enter amount: ");
 
         System.out.println("Select frequency: 1=Daily  2=Weekly  3=Monthly");
-        Customer.RecurringPayment.Frequency[] freqs = Customer.RecurringPayment.Frequency.values();
-        Customer.RecurringPayment.Frequency frequency = freqs[getUserSelection(3) - 1];
+        RecurringPayment.Frequency[] freqs = RecurringPayment.Frequency.values();
+        RecurringPayment.Frequency frequency = freqs[getUserSelection(3) - 1];
 
         try {
             customer.setupRecurringPayment(description, sourceIndex, targetIndex, amount, frequency);
@@ -68,7 +68,7 @@ public class RecurringPaymentMenu {
     }
 
     private void viewPayments() {
-        List<Customer.RecurringPayment> payments = customer.getRecurringPayments();
+        List<RecurringPayment> payments = customer.getRecurringPayments();
         if (payments.isEmpty()) {
             System.out.println("No recurring payments set up.");
             return;
@@ -84,10 +84,16 @@ public class RecurringPaymentMenu {
             return;
         }
         try {
-            customer.processRecurringPayments();
-            System.out.println("All recurring payments processed.");
+            int processedCount = customer.processRecurringPayments();
+            if (processedCount == 0) {
+                System.out.println("No recurring payments are due today.");
+            } else {
+                System.out.println(processedCount + " recurring payment(s) processed.");
+            }
         } catch (IllegalArgumentException | IndexOutOfBoundsException e) {
             System.out.println("A payment failed: " + e.getMessage());
+        } catch (IllegalStateException e) {
+            System.out.println("Recurring payment could not be processed: " + e.getMessage());
         }
     }
 

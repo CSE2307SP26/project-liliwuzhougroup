@@ -4,38 +4,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-
+import java.time.LocalDate;
 
 public class Customer implements Serializable {
     private static final long serialVersionUID = 1L;
-
-    public static class RecurringPayment implements Serializable {
-        private static final long serialVersionUID = 1L;
-
-        public enum Frequency { DAILY, WEEKLY, MONTHLY }
-
-        final String description;
-        final int sourceAccountIndex;
-        final int targetAccountIndex;
-        final double amount;
-        final Frequency frequency;
-
-        public RecurringPayment(String description, int sourceIndex, int targetIndex,
-                                double amount, Frequency frequency) {
-            this.description = description;
-            this.sourceAccountIndex = sourceIndex;
-            this.targetAccountIndex = targetIndex;
-            this.amount = amount;
-            this.frequency = frequency;
-        }
-
-        @Override
-        public String toString() {
-            return description + " | $" + amount + " | " + frequency
-                    + " | Acct #" + (sourceAccountIndex + 1) + " -> #" + (targetAccountIndex + 1);
-        }
-    }
 
     private final String name;
     private final ArrayList<BankAccount> accounts;
@@ -101,30 +73,45 @@ public class Customer implements Serializable {
 
     public void setupRecurringPayment(String description, int sourceIndex, int targetIndex,
                                       double amount, RecurringPayment.Frequency frequency) {
-        if (description == null || description.trim().isEmpty()) {
-            throw new IllegalArgumentException("Description cannot be blank.");
-        }
-        if (amount <= 0) {
-            throw new IllegalArgumentException("Amount must be greater than zero.");
-        }
-        if (sourceIndex < 0 || targetIndex < 0) {
-            throw new IllegalArgumentException("Account indices cannot be negative.");
-        }
-        recurringPayments.add(new RecurringPayment(description, sourceIndex, targetIndex, amount, frequency));
+        validateRecurringPaymentAccountIndex(sourceIndex, "Source");
+        validateRecurringPaymentAccountIndex(targetIndex, "Target");
+        recurringPayments.add(new RecurringPayment(
+                description,
+                sourceIndex,
+                targetIndex,
+                amount,
+                frequency,
+                LocalDate.now()
+        ));
     }
 
     public List<RecurringPayment> getRecurringPayments() {
         return Collections.unmodifiableList(recurringPayments);
     }
 
-    public void processRecurringPayments() {
+    public int processRecurringPayments() {
+        LocalDate processingDate = LocalDate.now();
+        int processedCount = 0;
         for (RecurringPayment payment : recurringPayments) {
-            accounts.get(payment.sourceAccountIndex).transferMoney(
-                    accounts.get(payment.targetAccountIndex), payment.amount);
+            if (!payment.isDue(processingDate)) {
+                continue;
+            }
+            payment.process(accounts, processingDate);
+            processedCount++;
         }
+        return processedCount;
     }
 
     public void cancelRecurringPayment(int index) {
+        if (index < 0 || index >= recurringPayments.size()) {
+            throw new IllegalArgumentException("Invalid recurring payment selection.");
+        }
         recurringPayments.remove(index);
+    }
+
+    private void validateRecurringPaymentAccountIndex(int accountIndex, String label) {
+        if (accountIndex < 0 || accountIndex >= accounts.size()) {
+            throw new IllegalArgumentException(label + " account selection is invalid.");
+        }
     }
 }
