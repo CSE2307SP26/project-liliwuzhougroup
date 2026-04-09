@@ -5,8 +5,8 @@ import java.util.Scanner;
 
 public class MainMenu {
 
-    private static final int EXIT_SELECTION = 11;
-    private static final int MAX_SELECTION = 11;
+    private static final int EXIT_SELECTION = 3;
+    private static final int MAX_SELECTION = 3;
 
     private final Scanner keyboardInput;
     private final Bank bank;
@@ -21,17 +21,9 @@ public class MainMenu {
 
     public void displayOptions() {
         System.out.println("Welcome to the 237 Bank App!");
-        System.out.println("1. Make a deposit");
-        System.out.println("2. Make a withdrawal");
-        System.out.println("3. Check account balance");
-        System.out.println("4. Check transaction history");
-        System.out.println("5. Create an additional account");
-        System.out.println("6. Close an existing account");
-        System.out.println("7. Transfer money between your accounts");
-        System.out.println("8. Admin: Collect fee");
-        System.out.println("9. Admin: Add interest payment");
-        System.out.println("10. Set password or PIN");
-        System.out.println("11. Exit the app");
+        System.out.println("1. Log in as customer");
+        System.out.println("2. Log in as admin");
+        System.out.println("3. Exit the app");
     }
 
     public int getUserSelection(int max) {
@@ -57,37 +49,13 @@ public class MainMenu {
                     runAdminMenu();
                     break;
                 case 3:
-                    displayBalance();
-                    break;
-                case 4:
-                    displayTransactionHistory();
-                    break;
-                case 5:
-                    createAdditionalAccount();
-                    break;
-                case 6:
-                    closeExistingAccount();
-                    break;
-                case 7:
-                    transferBetweenAccounts();
-                    break;
-                case 8:
-                    collectFee();
-                    break;
-                case 9:
-                    addInterest();
-                    break;
-                case 10:
-                    setPasswordOrPin();
-                    break;
-                case 11:
                     System.out.println("Thank you for using the 237 Bank App!");
                     break;
                 default:
                     System.out.println("Invalid selection.");
                     break;
             }
-        } catch (IllegalStateException | IllegalArgumentException e) {
+        } catch (IllegalStateException e) {
             System.out.println(e.getMessage());
         }
     }
@@ -139,32 +107,8 @@ public class MainMenu {
         }
         Customer selected = customers.get(getUserSelection(customers.size()) - 1);
 
-    public void setPasswordOrPin() {
-        keyboardInput.nextLine();
-        System.out.println("1. Set password");
-        System.out.println("2. Set PIN");
-        int choice = getUserSelection(2);
-        keyboardInput.nextLine();
-
-        if (choice == 1) {
-            System.out.print("Enter your new password: ");
-            String password = keyboardInput.nextLine();
-            customer.setPassword(password);
-            System.out.println("Password set successfully.");
-        } else {
-            System.out.print("Enter your 4-digit PIN: ");
-            String pin = keyboardInput.nextLine();
-            customer.setPin(pin);
-            System.out.println("PIN set successfully.");
-        }
-    }
-
-    private BankAccount selectAccount(String action) {
-        List<BankAccount> accounts = customer.getAccounts();
-        if (accounts.isEmpty()) {
-            throw new IllegalStateException("No accounts available to " + action + ".");
-        }
-        System.out.println("Select account to " + action + ":");
+        List<BankAccount> accounts = selected.getAccounts();
+        System.out.println("Select an account:");
         for (int i = 0; i < accounts.size(); i++) {
             System.out.println((i + 1) + ". Account #" + (i + 1) + " (Balance: " + accounts.get(i).getBalance() + ")");
         }
