@@ -154,8 +154,9 @@ public class MainMenu {
         }
     }
 
-        List<BankAccount> accounts = selected.getAccounts();
-        System.out.println("Select an account:");
+    private BankAccount selectAccount(String action) {
+        List<BankAccount> accounts = customer.getAccounts();
+        System.out.println("Select an account to " + action + ":");
         for (int i = 0; i < accounts.size(); i++) {
             System.out.println((i + 1) + ". Account #" + (i + 1) + " (Balance: " + accounts.get(i).getBalance() + ")");
         }
