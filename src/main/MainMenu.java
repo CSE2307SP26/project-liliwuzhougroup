@@ -5,8 +5,8 @@ import java.util.Scanner;
 
 public class MainMenu {
 
-    private static final int EXIT_SELECTION = 11;
-    private static final int MAX_SELECTION = 11;
+    private static final int EXIT_SELECTION = 13;
+    private static final int MAX_SELECTION = 13;
 
     private final Scanner keyboardInput;
     private final Customer customer;
@@ -34,10 +34,10 @@ public class MainMenu {
         System.out.println("7. Transfer money between your accounts");
         System.out.println("8. Admin: Collect fee");
         System.out.println("9. Admin: Add interest payment");
-
-        System.out.println("10. Set maximum withdrawal amount");
-
-        System.out.println("11. Exit the app");
+        System.out.println("10. Admin: Freeze account");
+        System.out.println("11. Admin: Unfreeze account");
+        System.out.println("12. Set maximum withdrawal amount");
+        System.out.println("13. Exit the app");
     }
 
     public int getUserSelection(int max) {
@@ -83,14 +83,20 @@ public class MainMenu {
                 case 9:
                     addInterest();
                     break;
-
                 case 10:
+                    freezeAccount();
+                    break;
+                case 11:
+                    unfreezeAccount();
+                    break;
+                case 12:
                     setMaximumWithdrawalAmount();
                     break;
-
-                case 11:
+                case 13:
                     System.out.println("Thank you for using the 237 Bank App!");
                     break;
+                default:
+                    System.out.println("Invalid selection.");
             }
         } catch (IllegalStateException e) {
             System.out.println(e.getMessage());
@@ -100,8 +106,12 @@ public class MainMenu {
     public void performDeposit() {
         BankAccount account = selectAccount("deposit into");
         double depositAmount = readPositiveAmount("How much would you like to deposit: ");
-        account.deposit(depositAmount);
-        System.out.println("Deposit successful.");
+        try {
+            account.deposit(depositAmount);
+            System.out.println("Deposit successful.");
+        } catch (IllegalStateException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     public void displayTransactionHistory() {
@@ -110,7 +120,7 @@ public class MainMenu {
         String history = account.getTransactionHistory();
         System.out.println(history.isEmpty() ? "No transactions yet." : history);
     }
-    
+
     public void performWithdrawal() {
         BankAccount account = selectAccount("withdraw from");
         double withdrawAmount = readPositiveAmount("How much would you like to withdraw: ");
@@ -135,8 +145,9 @@ public class MainMenu {
 
     public void displayBalance() {
         BankAccount account = selectAccount("check balance for");
+        String status = account.isFrozen() ? "Frozen" : "Active";
         System.out.println("Your current balance is: " + account.getBalance());
-
+        System.out.println("Account status: " + status);
         System.out.println("Maximum withdrawal amount is: " + account.getMaxWithdrawAmount());
     }
 
@@ -167,6 +178,8 @@ public class MainMenu {
             System.out.println("Transfer successful.");
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
+        } catch (IllegalStateException e) {
+            System.out.println(e.getMessage());
         }
     }
 
@@ -192,7 +205,26 @@ public class MainMenu {
         }
     }
 
-    //setting max withdrawal amount
+    public void freezeAccount() {
+        BankAccount account = selectAccount("freeze");
+        try {
+            bank.freezeAccount(account);
+            System.out.println("Account frozen successfully.");
+        } catch (IllegalStateException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void unfreezeAccount() {
+        BankAccount account = selectAccount("unfreeze");
+        try {
+            bank.unfreezeAccount(account);
+            System.out.println("Account unfrozen successfully.");
+        } catch (IllegalStateException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
     public void setMaximumWithdrawalAmount() {
         BankAccount account = selectAccount("set maximum withdrawal amount for");
         double maxAmount = readPositiveAmount("Enter the maximum withdrawal amount: ");
@@ -210,13 +242,17 @@ public class MainMenu {
         if (accounts.isEmpty()) {
             throw new IllegalStateException("No accounts available to " + action + ".");
         }
+
         System.out.println("Select account to " + action + ":");
         for (int i = 0; i < accounts.size(); i++) {
-            // CHANGED: show max withdrawal amount in account list
+            BankAccount account = accounts.get(i);
+            String status = account.isFrozen() ? "Frozen" : "Active";
             System.out.println((i + 1) + ". Account #" + (i + 1)
-                    + " (Balance: " + accounts.get(i).getBalance()
-                    + ", Max Withdraw: " + accounts.get(i).getMaxWithdrawAmount() + ")");
+                    + " (Balance: " + account.getBalance()
+                    + ", Status: " + status
+                    + ", Max Withdraw: " + account.getMaxWithdrawAmount() + ")");
         }
+
         int selectedAccount = getUserSelection(accounts.size());
         return accounts.get(selectedAccount - 1);
     }
