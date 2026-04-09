@@ -5,8 +5,8 @@ import java.util.Scanner;
 
 public class CustomerMenu {
 
-    protected static final int CUSTOMER_EXIT_SELECTION = 10;
-    protected static final int CUSTOMER_MAX_SELECTION = 10;
+    protected static final int CUSTOMER_EXIT_SELECTION = 11;
+    protected static final int CUSTOMER_MAX_SELECTION = 11;
 
     protected final Scanner keyboardInput;
     protected final Bank bank;
@@ -50,7 +50,8 @@ public class CustomerMenu {
         System.out.println("7. Transfer money between your accounts");
         System.out.println("8. Manage recurring payments");
         System.out.println("9. Update personal information");
-        System.out.println("10. Back to main menu");
+        System.out.println("10. Set password or PIN");
+        System.out.println("11. Back to main menu");
     }
 
     public void processInput(int selection) {
@@ -84,6 +85,9 @@ public class CustomerMenu {
                     updatePersonalInformation();
                     break;
                 case 10:
+                    setPasswordOrPin();
+                    break;
+                case 11:
                     System.out.println("Leaving customer menu.");
                     break;
                 default:
@@ -206,6 +210,26 @@ public class CustomerMenu {
 
         customer.updatePersonalInformation(address, phoneNumber, email);
         System.out.println("Personal information updated successfully.");
+    }
+
+    public void setPasswordOrPin() {
+        keyboardInput.skip("\\R?");
+        System.out.println("1. Set password");
+        System.out.println("2. Set PIN");
+        int choice = getUserSelection(2);
+        keyboardInput.skip("\\R?");
+
+        if (choice == 1) {
+            String password = readRequiredText("Enter your new password: ");
+            customer.setPassword(password);
+            System.out.println("Password set successfully.");
+            return;
+        }
+
+        System.out.print("Enter your 4-digit PIN: ");
+        String pin = keyboardInput.nextLine().trim();
+        customer.setPin(pin);
+        System.out.println("PIN set successfully.");
     }
 
     protected BankAccount selectAccount(String action) {
