@@ -193,4 +193,63 @@ public class RecurringPaymentTest {
             // expected
         }
     }
+
+    @Test
+    public void testRecurringPaymentRejectsNullProcessingDate() {
+        RecurringPayment payment = new RecurringPayment(
+                "Future payment",
+                0,
+                1,
+                50.0,
+                Frequency.MONTHLY,
+                LocalDate.now()
+        );
+
+        try {
+            payment.isDue(null);
+            fail("Expected IllegalArgumentException for null processing date.");
+        } catch (IllegalArgumentException e) {
+            assertEquals("Processing date is required.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testRecurringPaymentRejectsMissingAccountsDuringProcessing() {
+        RecurringPayment payment = new RecurringPayment(
+                "Transfer",
+                0,
+                1,
+                25.0,
+                Frequency.DAILY,
+                LocalDate.now()
+        );
+
+        try {
+            payment.process(null, LocalDate.now());
+            fail("Expected IllegalArgumentException for null accounts.");
+        } catch (IllegalArgumentException e) {
+            assertEquals("Accounts cannot be null.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testRecurringPaymentRejectsMissingTargetAccount() {
+        Customer customer = new Customer("Test User");
+        customer.getAccounts().get(0).deposit(100.0);
+        RecurringPayment payment = new RecurringPayment(
+                "Transfer",
+                0,
+                1,
+                25.0,
+                Frequency.DAILY,
+                LocalDate.now()
+        );
+
+        try {
+            payment.process(customer.getAccounts(), LocalDate.now());
+            fail("Expected IllegalArgumentException for a missing target account.");
+        } catch (IllegalArgumentException e) {
+            assertEquals("Target account no longer exists.", e.getMessage());
+        }
+    }
 }

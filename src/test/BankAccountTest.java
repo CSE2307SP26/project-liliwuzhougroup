@@ -30,6 +30,17 @@ public class BankAccountTest {
         }
     }
 
+    @Test
+    public void testZeroDepositIsRejected() {
+        BankAccount account = new BankAccount();
+        try {
+            account.deposit(0);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Deposit amount must be greater than 0.", e.getMessage());
+        }
+    }
+
     // added test for collect fee method
     @Test
     public void testCollectFee() {
@@ -179,7 +190,7 @@ public class BankAccountTest {
             sourceAccount.transferMoney(targetAccount, -50);
             fail();
         } catch (IllegalArgumentException e) {
-            assertEquals(e.getMessage(), "Transfer amount must be positive.");
+            assertEquals("Transfer amount must be positive.", e.getMessage());
         }
     }
 
@@ -192,7 +203,7 @@ public class BankAccountTest {
             sourceAccount.transferMoney(targetAccount, 150);
             fail();
         } catch (IllegalArgumentException e) {
-            assertEquals(e.getMessage(), "Insufficient funds in source account.");
+            assertEquals("Insufficient funds in source account.", e.getMessage());
         }
     }
 
@@ -204,7 +215,7 @@ public class BankAccountTest {
             sourceAccount.transferMoney(null, 50);
             fail();
         } catch (IllegalArgumentException e) {
-            assertEquals(e.getMessage(), "Source and target accounts cannot be null.");
+            assertEquals("Source and target accounts cannot be null.", e.getMessage());
         }
     }
 
@@ -229,7 +240,22 @@ public class BankAccountTest {
             sourceAccount.transferMoney(targetAccount, 0);
             fail();
         } catch (IllegalArgumentException e) {
-            assertEquals(e.getMessage(), "Transfer amount must be positive.");
+            assertEquals("Transfer amount must be positive.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testTransferToFrozenAccountIsRejected() {
+        BankAccount sourceAccount = new BankAccount();
+        BankAccount targetAccount = new BankAccount();
+        sourceAccount.deposit(100);
+        targetAccount.freezeAccount();
+
+        try {
+            sourceAccount.transferMoney(targetAccount, 25);
+            fail();
+        } catch (IllegalStateException e) {
+            assertEquals("You cannot transfer money into a frozen account.", e.getMessage());
         }
     }
     @Test
@@ -249,6 +275,30 @@ public class BankAccountTest {
         assertEquals(1, fees.size());
         assertEquals(25.0, fees.get(0).getAmount(), 0.001);
         assertEquals("Late fee", fees.get(0).getDescription());
+    }
+
+    @Test
+    public void testCreateFeeRejectsNullFee() {
+        BankAccount account = new BankAccount();
+
+        try {
+            account.createFee(null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Fee cannot be null.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testGetRemainingFeesReturnsCopy() {
+        BankAccount account = new BankAccount();
+        Fee fee = new Fee(25.0, "Late fee", new Date(System.currentTimeMillis() + 86400000));
+        account.createFee(fee);
+
+        List<Fee> fees = account.getRemainingFees();
+        fees.clear();
+
+        assertEquals(1, account.getRemainingFees().size());
     }
 
     // test for freeze and unfreeze account
@@ -294,6 +344,18 @@ public class BankAccountTest {
         BankAccount account = new BankAccount();
         account.setMaxWithdrawAmount(200);
         assertEquals(200, account.getMaxWithdrawAmount(), 0.01);
+    }
+
+    @Test
+    public void testSetMaxWithdrawAmountRejectsZero() {
+        BankAccount account = new BankAccount();
+
+        try {
+            account.setMaxWithdrawAmount(0);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Maximum withdrawal amount must be greater than 0.", e.getMessage());
+        }
     }
 
     @Test

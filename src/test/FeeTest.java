@@ -26,7 +26,7 @@ public class FeeTest {
     public void testFeeCreationWithNegativeAmount() {
         // Test creating a fee with a negative amount
         try {
-            Fee fee = new Fee(-5.0, "Invalid fee", new Date());
+            new Fee(-5.0, "Invalid fee", new Date());
             fail("Should throw an exception for negative fee amount");
         } catch (IllegalArgumentException e) {
             assertEquals("Fee amount cannot be negative.", e.getMessage());
@@ -59,13 +59,32 @@ public class FeeTest {
     }
 
     @Test
-    public void testSetInvalidDate() {
-        // Test creating a fee with an invalid date (null)
+    public void testFeeCreationWithPastDate() {
         try {
-            Fee fee = new Fee(10.0, "Invalid date fee", new Date(1000000000)); // A date in the past
+            new Fee(10.0, "Invalid date fee", new Date(1000000000));
             fail("Should not allow set a date before today");
         } catch (IllegalArgumentException e) {
             assertEquals("Due date cannot be in the past.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testFeeCreationRejectsNullDate() {
+        try {
+            new Fee(10.0, "Missing date fee", null);
+            fail("Should require a due date");
+        } catch (IllegalArgumentException e) {
+            assertEquals("Due date is required.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testFeeCreationRejectsBlankDescription() {
+        try {
+            new Fee(10.0, "   ", new Date(System.currentTimeMillis() + 86400000));
+            fail("Should require a description");
+        } catch (IllegalArgumentException e) {
+            assertEquals("Fee description cannot be blank.", e.getMessage());
         }
     }
 }

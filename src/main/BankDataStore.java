@@ -5,7 +5,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public final class BankDataStore {
@@ -15,8 +17,11 @@ public final class BankDataStore {
     }
 
     public static Bank loadBank() {
-        File file = new File(DATA_FILE);
-        if (!file.exists()) {
+        return loadBank(new File(DATA_FILE));
+    }
+
+    public static Bank loadBank(File file) {
+        if (file == null || !file.exists()) {
             return new Bank();
         }
 
@@ -41,18 +46,24 @@ public final class BankDataStore {
             }
         }
 
-        String json = jsonBuilder.toString();
-        return parseBankFromJson(json);
+        return parseBankFromJson(jsonBuilder.toString());
     }
 
     public static void saveBank(Bank bank) {
+        saveBank(bank, new File(DATA_FILE));
+    }
+
+    public static void saveBank(Bank bank, File file) {
         if (bank == null) {
             throw new IllegalArgumentException("Bank cannot be null.");
+        }
+        if (file == null) {
+            throw new IllegalArgumentException("File cannot be null.");
         }
 
         FileWriter writer = null;
         try {
-            writer = new FileWriter(DATA_FILE);
+            writer = new FileWriter(file);
             writer.write(buildBankJson(bank));
         } catch (IOException e) {
             throw new RuntimeException("Unable to save bank data.", e);
@@ -61,7 +72,6 @@ public final class BankDataStore {
                 try {
                     writer.close();
                 } catch (IOException e) {
-                
                 }
             }
         }
@@ -90,35 +100,49 @@ public final class BankDataStore {
     }
 
     private static Customer parseCustomer(String customerJson) {
-        String name = extractStringByKey(customerJson, "name");
+        String name = extractNullableStringByKey(customerJson, "name");
         if (name == null) {
             return null;
         }
 
-        String accountsArray = extractArrayByKey(customerJson, "accounts");
+        List<BankAccount> accounts = parseAccounts(extractArrayByKey(customerJson, "accounts"));
+        Customer customer = accounts.isEmpty() ? new Customer(name) : new Customer(name, accounts);
+
+        customer.restorePersonalInformation(
+                extractNullableStringByKey(customerJson, "address"),
+                extractNullableStringByKey(customerJson, "phoneNumber"),
+                extractNullableStringByKey(customerJson, "email")
+        );
+        customer.restorePassword(extractNullableStringByKey(customerJson, "password"));
+        customer.restorePin(extractNullableStringByKey(customerJson, "pin"));
+
+        List<RecurringPayment> payments = parseRecurringPayments(extractArrayByKey(customerJson, "recurringPayments"));
+        for (int i = 0; i < payments.size(); i++) {
+            customer.restoreRecurringPayment(payments.get(i));
+        }
+
+        return customer;
+    }
+
+    private static List<BankAccount> parseAccounts(String accountsArray) {
+        List<BankAccount> accounts = new ArrayList<BankAccount>();
         if (accountsArray == null) {
-            return new Customer(name);
+            return accounts;
         }
 
         List<String> accountObjects = splitTopLevelObjects(accountsArray);
-        List<BankAccount> accounts = new ArrayList<BankAccount>();
         for (int i = 0; i < accountObjects.size(); i++) {
             BankAccount account = parseAccount(accountObjects.get(i));
             if (account != null) {
                 accounts.add(account);
             }
         }
-
-        if (accounts.isEmpty()) {
-            return new Customer(name);
-        }
-
-        return new Customer(name, accounts);
+        return accounts;
     }
 
     private static BankAccount parseAccount(String accountJson) {
         Double balance = extractDoubleByKey(accountJson, "balance");
-        String transactionHistory = extractStringByKey(accountJson, "transactionHistory");
+        String transactionHistory = extractNullableStringByKey(accountJson, "transactionHistory");
         Boolean frozen = extractBooleanByKey(accountJson, "frozen");
         Double maxWithdrawAmount = extractDoubleByKey(accountJson, "maxWithdrawAmount");
 
@@ -134,8 +158,99 @@ public final class BankDataStore {
         if (maxWithdrawAmount == null || maxWithdrawAmount <= 0) {
             maxWithdrawAmount = Double.MAX_VALUE;
         }
-        return new BankAccount(balance.doubleValue(), transactionHistory, frozen.booleanValue(),
-                maxWithdrawAmount.doubleValue());
+
+        BankAccount account = new BankAccount(
+                balance.doubleValue(),
+                transactionHistory,
+                frozen.booleanValue(),
+                maxWithdrawAmount.doubleValue()
+        );
+
+        List<Fee> fees = parseFees(extractArrayByKey(accountJson, "fees"));
+        for (int i = 0; i < fees.size(); i++) {
+            account.createFee(fees.get(i));
+        }
+
+        return account;
+    }
+
+    private static List<Fee> parseFees(String feesArray) {
+        List<Fee> fees = new ArrayList<Fee>();
+        if (feesArray == null) {
+            return fees;
+        }
+
+        List<String> feeObjects = splitTopLevelObjects(feesArray);
+        for (int i = 0; i < feeObjects.size(); i++) {
+            Fee fee = parseFee(feeObjects.get(i));
+            if (fee != null) {
+                fees.add(fee);
+            }
+        }
+        return fees;
+    }
+
+    private static Fee parseFee(String feeJson) {
+        Double amount = extractDoubleByKey(feeJson, "amount");
+        String description = extractNullableStringByKey(feeJson, "description");
+        Long dueDateMillis = extractLongByKey(feeJson, "dueDateMillis");
+
+        if (amount == null || description == null || dueDateMillis == null) {
+            return null;
+        }
+
+        try {
+            return new Fee(amount.doubleValue(), description, new Date(dueDateMillis.longValue()));
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
+
+    private static List<RecurringPayment> parseRecurringPayments(String recurringPaymentsArray) {
+        List<RecurringPayment> payments = new ArrayList<RecurringPayment>();
+        if (recurringPaymentsArray == null) {
+            return payments;
+        }
+
+        List<String> paymentObjects = splitTopLevelObjects(recurringPaymentsArray);
+        for (int i = 0; i < paymentObjects.size(); i++) {
+            RecurringPayment payment = parseRecurringPayment(paymentObjects.get(i));
+            if (payment != null) {
+                payments.add(payment);
+            }
+        }
+        return payments;
+    }
+
+    private static RecurringPayment parseRecurringPayment(String paymentJson) {
+        String description = extractNullableStringByKey(paymentJson, "description");
+        Integer sourceAccountIndex = extractIntegerByKey(paymentJson, "sourceAccountIndex");
+        Integer targetAccountIndex = extractIntegerByKey(paymentJson, "targetAccountIndex");
+        Double amount = extractDoubleByKey(paymentJson, "amount");
+        String frequencyText = extractNullableStringByKey(paymentJson, "frequency");
+        String nextPaymentDateText = extractNullableStringByKey(paymentJson, "nextPaymentDate");
+
+        if (description == null
+                || sourceAccountIndex == null
+                || targetAccountIndex == null
+                || amount == null
+                || frequencyText == null
+                || nextPaymentDateText == null) {
+            return null;
+        }
+
+        try {
+            return new RecurringPayment(
+                    description,
+                    sourceAccountIndex.intValue(),
+                    targetAccountIndex.intValue(),
+                    amount.doubleValue(),
+                    RecurringPayment.Frequency.valueOf(frequencyText),
+                    LocalDate.parse(nextPaymentDateText)
+            );
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     private static String buildBankJson(Bank bank) {
@@ -147,7 +262,12 @@ public final class BankDataStore {
         for (int i = 0; i < customers.size(); i++) {
             Customer customer = customers.get(i);
             builder.append("    {\n");
-            builder.append("      \"name\": \"").append(escapeJson(customer.getName())).append("\",\n");
+            appendNullableStringField(builder, "      ", "name", customer.getName(), true);
+            appendNullableStringField(builder, "      ", "address", customer.getAddress(), true);
+            appendNullableStringField(builder, "      ", "phoneNumber", customer.getPhoneNumber(), true);
+            appendNullableStringField(builder, "      ", "email", customer.getEmail(), true);
+            appendNullableStringField(builder, "      ", "password", customer.getStoredPassword(), true);
+            appendNullableStringField(builder, "      ", "pin", customer.getStoredPin(), true);
             builder.append("      \"accounts\": [\n");
 
             List<BankAccount> accounts = customer.getAccounts();
@@ -155,15 +275,48 @@ public final class BankDataStore {
                 BankAccount account = accounts.get(j);
                 builder.append("        {\n");
                 builder.append("          \"balance\": ").append(account.getBalance()).append(",\n");
-                builder.append("          \"transactionHistory\": \"")
-                        .append(escapeJson(account.getTransactionHistory()))
-                        .append("\",\n");
-
+                appendNullableStringField(builder, "          ", "transactionHistory", account.getTransactionHistory(), true);
                 builder.append("          \"frozen\": ").append(account.isFrozen()).append(",\n");
-                builder.append("          \"maxWithdrawAmount\": ").append(account.getMaxWithdrawAmount()).append("\n");
+                builder.append("          \"maxWithdrawAmount\": ").append(account.getMaxWithdrawAmount()).append(",\n");
+                builder.append("          \"fees\": [\n");
 
+                List<Fee> fees = account.getRemainingFees();
+                for (int k = 0; k < fees.size(); k++) {
+                    Fee fee = fees.get(k);
+                    builder.append("            {\n");
+                    builder.append("              \"amount\": ").append(fee.getAmount()).append(",\n");
+                    appendNullableStringField(builder, "              ", "description", fee.getDescription(), true);
+                    builder.append("              \"dueDateMillis\": ").append(fee.getDueDate().getTime()).append("\n");
+                    builder.append("            }");
+                    if (k < fees.size() - 1) {
+                        builder.append(",");
+                    }
+                    builder.append("\n");
+                }
+
+                builder.append("          ]\n");
                 builder.append("        }");
                 if (j < accounts.size() - 1) {
+                    builder.append(",");
+                }
+                builder.append("\n");
+            }
+
+            builder.append("      ],\n");
+            builder.append("      \"recurringPayments\": [\n");
+
+            List<RecurringPayment> payments = customer.getRecurringPayments();
+            for (int j = 0; j < payments.size(); j++) {
+                RecurringPayment payment = payments.get(j);
+                builder.append("        {\n");
+                appendNullableStringField(builder, "          ", "description", payment.getDescription(), true);
+                builder.append("          \"sourceAccountIndex\": ").append(payment.getSourceAccountIndex()).append(",\n");
+                builder.append("          \"targetAccountIndex\": ").append(payment.getTargetAccountIndex()).append(",\n");
+                builder.append("          \"amount\": ").append(payment.getAmount()).append(",\n");
+                appendNullableStringField(builder, "          ", "frequency", payment.getFrequency().name(), true);
+                appendNullableStringField(builder, "          ", "nextPaymentDate", payment.getNextPaymentDate().toString(), false);
+                builder.append("        }");
+                if (j < payments.size() - 1) {
                     builder.append(",");
                 }
                 builder.append("\n");
@@ -180,6 +333,25 @@ public final class BankDataStore {
         builder.append("  ]\n");
         builder.append("}\n");
         return builder.toString();
+    }
+
+    private static void appendNullableStringField(
+            StringBuilder builder,
+            String indent,
+            String key,
+            String value,
+            boolean addComma
+    ) {
+        builder.append(indent).append("\"").append(key).append("\": ");
+        if (value == null) {
+            builder.append("null");
+        } else {
+            builder.append("\"").append(escapeJson(value)).append("\"");
+        }
+        if (addComma) {
+            builder.append(",");
+        }
+        builder.append("\n");
     }
 
     private static String extractArrayByKey(String json, String key) {
@@ -260,6 +432,14 @@ public final class BankDataStore {
         return objects;
     }
 
+    private static String extractNullableStringByKey(String json, String key) {
+        String literal = extractLiteralByKey(json, key);
+        if ("null".equals(literal)) {
+            return null;
+        }
+        return extractStringByKey(json, key);
+    }
+
     private static String extractStringByKey(String json, String key) {
         String keyText = "\"" + key + "\"";
         int keyIndex = json.indexOf(keyText);
@@ -294,7 +474,7 @@ public final class BankDataStore {
         return unescapeJson(escaped);
     }
 
-    private static Double extractDoubleByKey(String json, String key) {
+    private static String extractLiteralByKey(String json, String key) {
         String keyText = "\"" + key + "\"";
         int keyIndex = json.indexOf(keyText);
         if (keyIndex < 0) {
@@ -309,6 +489,10 @@ public final class BankDataStore {
         int start = colonIndex + 1;
         while (start < json.length() && Character.isWhitespace(json.charAt(start))) {
             start++;
+        }
+
+        if (start >= json.length() || json.charAt(start) == '"' || json.charAt(start) == '[' || json.charAt(start) == '{') {
+            return null;
         }
 
         int end = start;
@@ -324,38 +508,56 @@ public final class BankDataStore {
             return null;
         }
 
+        return json.substring(start, end);
+    }
+
+    private static Double extractDoubleByKey(String json, String key) {
+        String valueText = extractLiteralByKey(json, key);
+        if (valueText == null) {
+            return null;
+        }
+
         try {
-            return Double.valueOf(json.substring(start, end));
+            return Double.valueOf(valueText);
         } catch (NumberFormatException e) {
             return null;
         }
     }
 
-    // NEW: helper method to read true/false values like "frozen": true
+    private static Integer extractIntegerByKey(String json, String key) {
+        String valueText = extractLiteralByKey(json, key);
+        if (valueText == null) {
+            return null;
+        }
+
+        try {
+            return Integer.valueOf(valueText);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    private static Long extractLongByKey(String json, String key) {
+        String valueText = extractLiteralByKey(json, key);
+        if (valueText == null) {
+            return null;
+        }
+
+        try {
+            return Long.valueOf(valueText);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
     private static Boolean extractBooleanByKey(String json, String key) {
-        String keyText = "\"" + key + "\"";
-        int keyIndex = json.indexOf(keyText);
-        if (keyIndex < 0) {
-            return null;
-        }
-
-        int colonIndex = json.indexOf(":", keyIndex);
-        if (colonIndex < 0) {
-            return null;
-        }
-
-        int start = colonIndex + 1;
-        while (start < json.length() && Character.isWhitespace(json.charAt(start))) {
-            start++;
-        }
-
-        if (json.startsWith("true", start)) {
+        String valueText = extractLiteralByKey(json, key);
+        if ("true".equals(valueText)) {
             return Boolean.TRUE;
         }
-        if (json.startsWith("false", start)) {
+        if ("false".equals(valueText)) {
             return Boolean.FALSE;
         }
-
         return null;
     }
 

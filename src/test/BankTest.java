@@ -8,6 +8,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
 
 public class BankTest {
 
@@ -83,5 +84,65 @@ public class BankTest {
 
         bank.unfreezeAccount(account);
         assertFalse(account.isFrozen());
+    }
+
+    @Test
+    public void testCollectFeeRejectsNullAccount() {
+        Bank bank = new Bank();
+
+        try {
+            bank.collectFee(null, 10.0);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Account cannot be null.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testAddInterestRejectsNullAccount() {
+        Bank bank = new Bank();
+
+        try {
+            bank.addInterest(null, 5.0);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Account cannot be null.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testFreezeAccountRejectsNullAccount() {
+        Bank bank = new Bank();
+
+        try {
+            bank.freezeAccount(null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Account cannot be null.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testUnfreezeAccountRejectsNullAccount() {
+        Bank bank = new Bank();
+
+        try {
+            bank.unfreezeAccount(null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Account cannot be null.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testGetAllCustomersHistoryIncludesEmptyAccounts() {
+        Bank bank = new Bank();
+        Customer customer = new Customer("Alice");
+        bank.addCustomer(customer);
+
+        String history = bank.getAllCustomersHistory();
+
+        assertTrue(history.contains("Customer: Alice"));
+        assertTrue(history.contains("No transactions yet."));
     }
 }

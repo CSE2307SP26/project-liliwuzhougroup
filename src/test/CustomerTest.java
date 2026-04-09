@@ -1,7 +1,10 @@
 package test;
 
+import main.BankAccount;
 import main.Customer;
 import org.junit.Test;
+
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -33,6 +36,30 @@ public class CustomerTest {
     }
 
     @Test
+    public void testUpdatePersonalInformationRejectsBlankPhoneNumber() {
+        Customer customer = new Customer("Nick");
+
+        try {
+            customer.updatePersonalInformation("123 Main St", "   ", "Nick@test.com");
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Phone number cannot be empty.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testUpdatePersonalInformationRejectsBlankEmail() {
+        Customer customer = new Customer("Nick");
+
+        try {
+            customer.updatePersonalInformation("123 Main St", "5551234567", "");
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Email cannot be empty.", e.getMessage());
+        }
+    }
+
+    @Test
     public void testSetPasswordAndVerifyPassword() {
         Customer customer = new Customer("Nick");
         customer.setPassword("securePass123");
@@ -58,6 +85,43 @@ public class CustomerTest {
             customer.setPin("12a4");
             fail();
         } catch (IllegalArgumentException e) {
+            // expected
+        }
+    }
+
+    @Test
+    public void testOpenAccountRejectsNullAccount() {
+        Customer customer = new Customer("Nick");
+
+        try {
+            customer.openAccount(null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Account cannot be null.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testCloseAccountRejectsNullAccount() {
+        Customer customer = new Customer("Nick");
+
+        try {
+            customer.closeAccount(null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Account cannot be null.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testAccountsListIsUnmodifiable() {
+        Customer customer = new Customer("Nick");
+        List<BankAccount> accounts = customer.getAccounts();
+
+        try {
+            accounts.add(new BankAccount());
+            fail();
+        } catch (UnsupportedOperationException e) {
             // expected
         }
     }

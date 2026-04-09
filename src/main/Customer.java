@@ -61,6 +61,14 @@ public class Customer implements Serializable {
         return this.email;
     }
 
+    String getStoredPassword() {
+        return this.password;
+    }
+
+    String getStoredPin() {
+        return this.pin;
+    }
+
     public List<BankAccount> getAccounts() {
         return Collections.unmodifiableList(this.accounts);
     }
@@ -99,6 +107,20 @@ public class Customer implements Serializable {
             return false;
         }
         return this.pin.equals(pin);
+    }
+
+    void restorePersonalInformation(String address, String phoneNumber, String email) {
+        this.address = address;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+    }
+
+    void restorePassword(String password) {
+        this.password = password;
+    }
+
+    void restorePin(String pin) {
+        this.pin = pin;
     }
 
     public BankAccount openAccount() {
@@ -140,6 +162,13 @@ public class Customer implements Serializable {
 
     public List<RecurringPayment> getRecurringPayments() {
         return Collections.unmodifiableList(recurringPayments);
+    }
+
+    void restoreRecurringPayment(RecurringPayment payment) {
+        if (payment == null) {
+            throw new IllegalArgumentException("Recurring payment cannot be null.");
+        }
+        recurringPayments.add(payment);
     }
 
     public int processRecurringPayments() {

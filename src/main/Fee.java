@@ -11,8 +11,14 @@ public class Fee {
         if (amount < 0) {
             throw new IllegalArgumentException("Fee amount cannot be negative.");
         }
+        if (description == null || description.trim().isEmpty()) {
+            throw new IllegalArgumentException("Fee description cannot be blank.");
+        }
+        if (dueDate == null) {
+            throw new IllegalArgumentException("Due date is required.");
+        }
         this.amount = amount;
-        this.description = description;
+        this.description = description.trim();
         if (dueDate.before(new Date())) {
             throw new IllegalArgumentException("Due date cannot be in the past.");
         }
