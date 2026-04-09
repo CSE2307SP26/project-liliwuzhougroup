@@ -1,52 +1,48 @@
 package test;
-import java.util.ArrayList;
+
 import main.BankAccount;
-import main.CloseAccount;
+import main.Customer;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 public class CloseAccountTest {
 
 
     @Test
     public void testCloseAccount() {
-        CloseAccount closeAccount = new CloseAccount();
-        BankAccount account = new BankAccount();
-        ArrayList<BankAccount> accounts = new ArrayList<>();
-        accounts.add(account);
-        closeAccount.closeAccount(accounts, account);
-        assertTrue(accounts.isEmpty());
+        Customer customer = new Customer("John");
+        BankAccount account = customer.openAccount();
+        customer.closeAccount(account);
+        assertEquals(1, customer.getAccounts().size());
     }
 
     @Test
     public void testCloseAccountWithNonZeroBalance() {
-        CloseAccount closeAccount = new CloseAccount();
+        Customer customer = new Customer("John");
         BankAccount account = new BankAccount();
         account.deposit(100);
-        ArrayList<BankAccount> accounts = new ArrayList<>();
-        accounts.add(account);
+        customer.openAccount(account);
         try {
-            closeAccount.closeAccount(accounts, account);
+            customer.closeAccount(account);
+            fail();
         } catch (IllegalStateException e) {
             assertEquals("Cannot close account with non-zero balance.", e.getMessage());
         }
-        assertTrue(accounts.contains(account));
+        assertTrue(customer.getAccounts().contains(account));
     }
 
     @Test
     public void testCloseAndReturnAccounts() {
-        CloseAccount closeAccount = new CloseAccount();
-        BankAccount account1 = new BankAccount();
-        BankAccount account2 = new BankAccount();
-        ArrayList<BankAccount> accounts = new ArrayList<>();
-        accounts.add(account1);
-        accounts.add(account2);
-        ArrayList<BankAccount> updatedAccounts = closeAccount.closeAndReturnAccounts(accounts, account1);
-        assertEquals(1, updatedAccounts.size());
-        assertTrue(updatedAccounts.contains(account2));
+        Customer customer = new Customer("John");
+        BankAccount account1 = customer.openAccount();
+        BankAccount account2 = customer.openAccount();
+        customer.closeAccount(account1);
+        assertEquals(2, customer.getAccounts().size());
+        assertTrue(customer.getAccounts().contains(account2));
     }
 
 }

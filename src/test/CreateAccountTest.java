@@ -1,10 +1,8 @@
 package test;
 
 import main.BankAccount;
-import main.CreateAccount;
+import main.Customer;
 import org.junit.Test;
-
-import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 
@@ -12,25 +10,19 @@ public class CreateAccountTest {
 
     @Test
     public void testCreateBlankAccount() {
-        CreateAccount ca = new CreateAccount();
-        ArrayList<BankAccount> accounts = new ArrayList<>();
-
-        ca.createBlankAccount(accounts);
-
-        assertEquals(1, accounts.size());
-        assertNotNull(accounts.get(0));
-        assertEquals(0, accounts.get(0).getBalance(), 0.01);
+        Customer customer = new Customer("John");
+        BankAccount account = customer.openAccount();
+        assertNotNull(account);
+        assertEquals(2, customer.getAccounts().size());
+        assertEquals(0, account.getBalance(), 0.01);
     }
 
     @Test
     public void testCreateAccount() {
-        CreateAccount ca = new CreateAccount();
-        ArrayList<BankAccount> accounts = new ArrayList<>();
+        Customer customer = new Customer("John");
         BankAccount account = new BankAccount();
-
-        ca.createAccount(accounts, account);
-
-        assertEquals(1, accounts.size());
-        assertSame(account, accounts.get(0));
+        customer.openAccount(account);
+        assertEquals(2, customer.getAccounts().size());
+        assertSame(account, customer.getAccounts().get(1));
     }
 }
