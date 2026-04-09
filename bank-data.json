@@ -1,0 +1,13 @@
+{
+  "customers": [
+    {
+      "name": "Default User",
+      "accounts": [
+        {
+          "balance": 0.0,
+          "transactionHistory": ""
+        }
+      ]
+    }
+  ]
+}
