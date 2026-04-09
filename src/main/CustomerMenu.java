@@ -5,8 +5,8 @@ import java.util.Scanner;
 
 public class CustomerMenu {
 
-    protected static final int CUSTOMER_EXIT_SELECTION = 9;
-    protected static final int CUSTOMER_MAX_SELECTION = 9;
+    protected static final int CUSTOMER_EXIT_SELECTION = 10;
+    protected static final int CUSTOMER_MAX_SELECTION = 10;
 
     protected final Scanner keyboardInput;
     protected final Bank bank;
@@ -49,7 +49,8 @@ public class CustomerMenu {
         System.out.println("6. Close an existing account");
         System.out.println("7. Transfer money between your accounts");
         System.out.println("8. Manage recurring payments");
-        System.out.println("9. Back to main menu");
+        System.out.println("9. Update personal information");
+        System.out.println("10. Back to main menu");
     }
 
     public void processInput(int selection) {
@@ -80,13 +81,16 @@ public class CustomerMenu {
                     manageRecurringPayments();
                     break;
                 case 9:
+                    updatePersonalInformation();
+                    break;
+                case 10:
                     System.out.println("Leaving customer menu.");
                     break;
                 default:
                     System.out.println("Invalid selection.");
                     break;
             }
-        } catch (IllegalStateException e) {
+        } catch (IllegalStateException | IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }
     }
@@ -194,6 +198,16 @@ public class CustomerMenu {
         new RecurringPaymentMenu(keyboardInput, customer).run();
     }
 
+    public void updatePersonalInformation() {
+        keyboardInput.skip("\\R?");
+        String address = readRequiredText("Enter your address: ");
+        String phoneNumber = readRequiredText("Enter your phone number: ");
+        String email = readRequiredText("Enter your email: ");
+
+        customer.updatePersonalInformation(address, phoneNumber, email);
+        System.out.println("Personal information updated successfully.");
+    }
+
     protected BankAccount selectAccount(String action) {
         List<BankAccount> accounts = customer.getAccounts();
         if (accounts.isEmpty()) {
@@ -227,5 +241,14 @@ public class CustomerMenu {
             }
         }
         return amount;
+    }
+
+    protected String readRequiredText(String prompt) {
+        String value = "";
+        while (value.trim().isEmpty()) {
+            System.out.print(prompt);
+            value = keyboardInput.nextLine();
+        }
+        return value.trim();
     }
 }
