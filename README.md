@@ -52,3 +52,8 @@ chmod +x runApp.sh
 ./runApp.sh
 ```
 
+## Admin Password
+```text
+admin123
+```
+
