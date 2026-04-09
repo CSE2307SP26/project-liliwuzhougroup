@@ -1,5 +1,6 @@
 package main;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class MainMenu {
@@ -92,6 +93,30 @@ public class MainMenu {
         }
         int selectedCustomer = getUserSelection(bank.getCustomers().size());
         return bank.getCustomers().get(selectedCustomer - 1);
+    }
+
+    public void viewAdminTransactionHistory() {
+        List<Customer> customers = bank.getCustomers();
+        if (customers.isEmpty()) {
+            System.out.println("No customers found.");
+            return;
+        }
+        System.out.println("Select a customer:");
+        for (int i = 0; i < customers.size(); i++) {
+            System.out.println((i + 1) + ". " + customers.get(i).getName());
+        }
+        Customer selected = customers.get(getUserSelection(customers.size()) - 1);
+
+        List<BankAccount> accounts = selected.getAccounts();
+        System.out.println("Select an account:");
+        for (int i = 0; i < accounts.size(); i++) {
+            System.out.println((i + 1) + ". Account #" + (i + 1) + " (Balance: " + accounts.get(i).getBalance() + ")");
+        }
+        BankAccount account = accounts.get(getUserSelection(accounts.size()) - 1);
+
+        String history = account.getTransactionHistory();
+        System.out.println("Transaction History:");
+        System.out.println(history.isEmpty() ? "No transactions yet." : history);
     }
 
     private void saveData() {
