@@ -5,8 +5,8 @@ import java.util.Scanner;
 
 public class MainMenu {
 
-    private static final int EXIT_SELECTION = 10;
-    private static final int MAX_SELECTION = 11;
+    private static final int EXIT_SELECTION = 14;
+    private static final int MAX_SELECTION = 14;
 
     private final Scanner keyboardInput;
     private final Customer customer;
@@ -34,8 +34,11 @@ public class MainMenu {
         System.out.println("7. Transfer money between your accounts");
         System.out.println("8. Admin: Collect fee");
         System.out.println("9. Admin: Add interest payment");
-        System.out.println("10. Exit the app");
-        System.out.println("11. Manage recurring payments");
+        System.out.println("10. Admin: Freeze account");
+        System.out.println("11. Admin: Unfreeze account");
+        System.out.println("12. Set maximum withdrawal amount");
+        System.out.println("13. Manage recurring payments");
+        System.out.println("14. Exit the app");
     }
 
     public int getUserSelection(int max) {
@@ -82,10 +85,22 @@ public class MainMenu {
                     addInterest();
                     break;
                 case 10:
-                    System.out.println("Thank you for using the 237 Bank App!");
+                    freezeAccount();
                     break;
                 case 11:
+                    unfreezeAccount();
+                    break;
+                case 12:
+                    setMaximumWithdrawalAmount();
+                    break;
+                case 13:
                     manageRecurringPayments();
+                    break;
+                case 14:
+                    System.out.println("Thank you for using the 237 Bank App!");
+                    break;
+                default:
+                    System.out.println("Invalid selection.");
                     break;
             }
         } catch (IllegalStateException e) {
@@ -96,8 +111,12 @@ public class MainMenu {
     public void performDeposit() {
         BankAccount account = selectAccount("deposit into");
         double depositAmount = readPositiveAmount("How much would you like to deposit: ");
-        account.deposit(depositAmount);
-        System.out.println("Deposit successful.");
+        try {
+            account.deposit(depositAmount);
+            System.out.println("Deposit successful.");
+        } catch (IllegalStateException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     public void displayTransactionHistory() {
@@ -106,7 +125,7 @@ public class MainMenu {
         String history = account.getTransactionHistory();
         System.out.println(history.isEmpty() ? "No transactions yet." : history);
     }
-    
+
     public void performWithdrawal() {
         BankAccount account = selectAccount("withdraw from");
         double withdrawAmount = readPositiveAmount("How much would you like to withdraw: ");
@@ -115,7 +134,7 @@ public class MainMenu {
             account.withdraw(withdrawAmount);
             System.out.println("Withdrawal successful.");
         } catch (IllegalArgumentException e) {
-            System.out.println("Invalid withdrawal. Please make sure the amount is greater than 0 and does not exceed your balance.");
+            System.out.println(e.getMessage());
         }
     }
 
@@ -131,7 +150,10 @@ public class MainMenu {
 
     public void displayBalance() {
         BankAccount account = selectAccount("check balance for");
+        String status = account.isFrozen() ? "Frozen" : "Active";
         System.out.println("Your current balance is: " + account.getBalance());
+        System.out.println("Account status: " + status);
+        System.out.println("Maximum withdrawal amount is: " + account.getMaxWithdrawAmount());
     }
 
     public void createAdditionalAccount() {
@@ -161,6 +183,8 @@ public class MainMenu {
             System.out.println("Transfer successful.");
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
+        } catch (IllegalStateException e) {
+            System.out.println(e.getMessage());
         }
     }
 
@@ -186,17 +210,66 @@ public class MainMenu {
         }
     }
 
+    public void freezeAccount() {
+        BankAccount account = selectAccount("freeze");
+        try {
+            bank.freezeAccount(account);
+            System.out.println("Account frozen successfully.");
+        } catch (IllegalStateException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void unfreezeAccount() {
+        BankAccount account = selectAccount("unfreeze");
+        try {
+            bank.unfreezeAccount(account);
+            System.out.println("Account unfrozen successfully.");
+        } catch (IllegalStateException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void setMaximumWithdrawalAmount() {
+        BankAccount account = selectAccount("set maximum withdrawal amount for");
+        double maxAmount = readPositiveAmount("Enter the maximum withdrawal amount: ");
+
+        try {
+            account.setMaxWithdrawAmount(maxAmount);
+            System.out.println("Maximum withdrawal amount updated successfully.");
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
     private BankAccount selectAccount(String action) {
         List<BankAccount> accounts = customer.getAccounts();
         if (accounts.isEmpty()) {
             throw new IllegalStateException("No accounts available to " + action + ".");
         }
+
         System.out.println("Select account to " + action + ":");
         for (int i = 0; i < accounts.size(); i++) {
-            System.out.println((i + 1) + ". Account #" + (i + 1) + " (Balance: " + accounts.get(i).getBalance() + ")");
+            BankAccount account = accounts.get(i);
+            String status = account.isFrozen() ? "Frozen" : "Active";
+            System.out.println((i + 1) + ". Account #" + (i + 1)
+                    + " (Balance: " + account.getBalance()
+                    + ", Status: " + status
+                    + ", Max Withdraw: " + account.getMaxWithdrawAmount() + ")");
         }
+
         int selectedAccount = getUserSelection(accounts.size());
-        return accounts.get(selectedAccount - 1);
+        BankAccount account = accounts.get(selectedAccount - 1);
+        displayRemainingFees(account);
+        return account;
+    }
+
+    public void displayRemainingFees(BankAccount account) {
+        List<Fee> fees = account.getRemainingFees();
+        for (int i = 0; i < fees.size(); i++) {
+            Fee fee = fees.get(i);
+            System.out.println("You have " + fee.getAmount() + " due for " + fee.getDescription() + " on " + fee.getDueDate() + ".");
+        }
     }
 
     private double readPositiveAmount(String prompt) {

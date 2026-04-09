@@ -39,4 +39,18 @@ public class Bank implements Serializable {
         }
         account.addInterest(interestAmount);
     }
+
+    public void freezeAccount(BankAccount account) {
+        if (account == null) {
+            throw new IllegalArgumentException("Account cannot be null.");
+        }
+        account.freezeAccount();
+    }
+
+    public void unfreezeAccount(BankAccount account) {
+        if (account == null) {
+            throw new IllegalArgumentException("Account cannot be null.");
+        }
+        account.unfreezeAccount();
+    }
 }
