@@ -9,23 +9,45 @@ public class BankAccount implements Serializable {
     private double balance;
     private String transactionHistory;
     private boolean frozen;
+    private double maxWithdrawAmount;
 
     public BankAccount() {
         this.balance = 0;
         this.transactionHistory = "";
         this.frozen = false;
+        this.maxWithdrawAmount = Double.MAX_VALUE;
     }
 
     public BankAccount(double balance, String transactionHistory) {
         this.balance = balance;
         this.transactionHistory = transactionHistory == null ? "" : transactionHistory;
         this.frozen = false;
+        this.maxWithdrawAmount = Double.MAX_VALUE;
     }
 
     public BankAccount(double balance, String transactionHistory, boolean frozen) {
         this.balance = balance;
         this.transactionHistory = transactionHistory == null ? "" : transactionHistory;
         this.frozen = frozen;
+        this.maxWithdrawAmount = Double.MAX_VALUE;
+    }
+
+    public BankAccount(double balance, String transactionHistory, boolean frozen, double maxWithdrawAmount) {
+        this.balance = balance;
+        this.transactionHistory = transactionHistory == null ? "" : transactionHistory;
+        this.frozen = frozen;
+        this.maxWithdrawAmount = maxWithdrawAmount <= 0 ? Double.MAX_VALUE : maxWithdrawAmount;
+    }
+
+    public BankAccount(double balance, String transactionHistory, double maxWithdrawAmount) {
+        this.balance = balance;
+        this.transactionHistory = transactionHistory == null ? "" : transactionHistory;
+        this.frozen = false;
+        if (maxWithdrawAmount <= 0) {
+            this.maxWithdrawAmount = Double.MAX_VALUE;
+        } else {
+            this.maxWithdrawAmount = maxWithdrawAmount;
+        }
     }
 
     public void deposit(double amount) {
@@ -84,16 +106,31 @@ public class BankAccount implements Serializable {
         this.transactionHistory += "Account unfrozen.\n";
     }
 
+    public double getMaxWithdrawAmount() {
+        return this.maxWithdrawAmount;
+    }
+
+    public void setMaxWithdrawAmount(double maxWithdrawAmount) {
+        if (maxWithdrawAmount <= 0) {
+            throw new IllegalArgumentException("Maximum withdrawal amount must be greater than 0.");
+        }
+
+        this.maxWithdrawAmount = maxWithdrawAmount;
+        this.transactionHistory += "Maximum withdrawal amount set to: " + maxWithdrawAmount + "\n";
+    }
     public void withdraw(double amount) {
         ensureAccountIsActive();
 
         if (amount <= 0) {
             throw new IllegalArgumentException("Withdrawal amount must be greater than 0.");
         }
-        if (amount > balance) {
-            throw new IllegalArgumentException("You are overdrafting your account.");
-        }
 
+        if (amount > maxWithdrawAmount) {
+            throw new IllegalArgumentException("Withdrawal amount exceeds the maximum amount");
+        }
+        if (amount > balance) {
+            throw new IllegalArgumentException("Insufficient funds.");
+        }
         balance -= amount;
         this.transactionHistory += "Withdrew: " + amount + "\n";
     }
@@ -102,7 +139,7 @@ public class BankAccount implements Serializable {
         ensureAccountIsActive();
 
         if (targetAccount == null) {
-            throw new IllegalArgumentException("Target account cannot be null.");
+            throw new IllegalArgumentException("Source and target accounts cannot be null.");
         }
         if (targetAccount.isFrozen()) {
             throw new IllegalStateException("You cannot transfer money into a frozen account.");

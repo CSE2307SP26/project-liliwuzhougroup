@@ -119,9 +119,8 @@ public final class BankDataStore {
     private static BankAccount parseAccount(String accountJson) {
         Double balance = extractDoubleByKey(accountJson, "balance");
         String transactionHistory = extractStringByKey(accountJson, "transactionHistory");
-
-        // read frozen 
         Boolean frozen = extractBooleanByKey(accountJson, "frozen");
+        Double maxWithdrawAmount = extractDoubleByKey(accountJson, "maxWithdrawAmount");
 
         if (balance == null) {
             return null;
@@ -129,14 +128,14 @@ public final class BankDataStore {
         if (transactionHistory == null) {
             transactionHistory = "";
         }
-
-       
         if (frozen == null) {
             frozen = false;
         }
-
-    
-        return new BankAccount(balance.doubleValue(), transactionHistory, frozen.booleanValue());
+        if (maxWithdrawAmount == null || maxWithdrawAmount <= 0) {
+            maxWithdrawAmount = Double.MAX_VALUE;
+        }
+        return new BankAccount(balance.doubleValue(), transactionHistory, frozen.booleanValue(),
+                maxWithdrawAmount.doubleValue());
     }
 
     private static String buildBankJson(Bank bank) {
@@ -160,8 +159,8 @@ public final class BankDataStore {
                         .append(escapeJson(account.getTransactionHistory()))
                         .append("\",\n");
 
-                // frozen status
-                builder.append("          \"frozen\": ").append(account.isFrozen()).append("\n");
+                builder.append("          \"frozen\": ").append(account.isFrozen()).append(",\n");
+                builder.append("          \"maxWithdrawAmount\": ").append(account.getMaxWithdrawAmount()).append("\n");
 
                 builder.append("        }");
                 if (j < accounts.size() - 1) {

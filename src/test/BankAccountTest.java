@@ -230,7 +230,7 @@ public class BankAccountTest {
         }
     }
 
-    // test for free and unfreeze account
+    // test for freeze and unfreeze account
     @Test
     public void testFreezeAccountBlocksDepositAndWithdraw() {
         BankAccount account = new BankAccount();
@@ -266,5 +266,37 @@ public class BankAccountTest {
         account.withdraw(40);
 
         assertEquals(60, account.getBalance(), 0.01);
+    }
+
+    @Test
+    public void testSetMaxWithdrawAmount() {
+        BankAccount account = new BankAccount();
+        account.setMaxWithdrawAmount(200);
+        assertEquals(200, account.getMaxWithdrawAmount(), 0.01);
+    }
+
+    @Test
+    public void testWithdrawExceedsMaxWithdrawAmount() {
+        BankAccount account = new BankAccount();
+        account.deposit(500);
+        account.setMaxWithdrawAmount(100);
+
+        try {
+            account.withdraw(150);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Withdrawal amount exceeds the maximum amount", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testWithdrawWithinMaxWithdrawAmount() {
+        BankAccount account = new BankAccount();
+        account.deposit(500);
+        account.setMaxWithdrawAmount(100);
+
+        account.withdraw(80);
+
+        assertEquals(420, account.getBalance(), 0.01);
     }
 }
