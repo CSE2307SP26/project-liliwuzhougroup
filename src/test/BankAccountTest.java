@@ -4,6 +4,8 @@ import main.BankAccount;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class BankAccountTest {
 
@@ -44,7 +46,7 @@ public class BankAccountTest {
             // expected
         }
     }
-  
+
     @Test
     public void testCreateAccount() {
         BankAccount account = new BankAccount();
@@ -63,31 +65,30 @@ public class BankAccountTest {
         account.deposit(100);
         assertEquals(100, account.getBalance(), 0.01);
     }
-    
-    //transaction-history test
+
+    // transaction-history test
     @Test
     public void testTransactionHistoryStartsEmpty() {
-    BankAccount account = new BankAccount();
-    assertEquals("", account.getTransactionHistory());
+        BankAccount account = new BankAccount();
+        assertEquals("", account.getTransactionHistory());
     }
 
     @Test
     public void testTransactionHistoryAfterDeposit() {
-    BankAccount account = new BankAccount();
-    account.deposit(100);
-    assertEquals("Deposited: 100.0\n", account.getTransactionHistory());
+        BankAccount account = new BankAccount();
+        account.deposit(100);
+        assertEquals("Deposited: 100.0\n", account.getTransactionHistory());
     }
 
     @Test
     public void testTransactionHistoryAfterMultipleDeposits() {
-    BankAccount account = new BankAccount();
-    account.deposit(100);
-    account.deposit(50);
-    assertEquals("Deposited: 100.0\nDeposited: 50.0\n", account.getTransactionHistory());
+        BankAccount account = new BankAccount();
+        account.deposit(100);
+        account.deposit(50);
+        assertEquals("Deposited: 100.0\nDeposited: 50.0\n", account.getTransactionHistory());
     }
 
-
-    //withdrawTest
+    // withdrawTest
     @Test
     public void testWithdraw() {
         BankAccount account = new BankAccount();
@@ -136,6 +137,7 @@ public class BankAccountTest {
         } catch (IllegalArgumentException e) {
         }
     }
+
     @Test
     public void testAddInterest() {
         BankAccount account = new BankAccount();
@@ -227,5 +229,42 @@ public class BankAccountTest {
             assertEquals(e.getMessage(), "Transfer amount must be positive.");
         }
     }
-}
 
+    // test for free and unfreeze account
+    @Test
+    public void testFreezeAccountBlocksDepositAndWithdraw() {
+        BankAccount account = new BankAccount();
+        account.freezeAccount();
+
+        assertTrue(account.isFrozen());
+
+        try {
+            account.deposit(50);
+            fail();
+        } catch (IllegalStateException e) {
+            assertEquals("This account is frozen. Transactions are not allowed.", e.getMessage());
+        }
+
+        try {
+            account.withdraw(20);
+            fail();
+        } catch (IllegalStateException e) {
+            assertEquals("This account is frozen. Transactions are not allowed.", e.getMessage());
+        }
+    }
+
+    // unfreeze account test
+    @Test
+    public void testUnfreezeAccountAllowsTransactionsAgain() {
+        BankAccount account = new BankAccount();
+        account.freezeAccount();
+        account.unfreezeAccount();
+
+        assertFalse(account.isFrozen());
+
+        account.deposit(100);
+        account.withdraw(40);
+
+        assertEquals(60, account.getBalance(), 0.01);
+    }
+}
