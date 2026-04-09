@@ -5,8 +5,8 @@ import java.util.Scanner;
 
 public class MainMenu {
 
-    private static final int EXIT_SELECTION = 11;
-    private static final int MAX_SELECTION = 11;
+    private static final int EXIT_SELECTION = 12;
+    private static final int MAX_SELECTION = 12;
 
     private final Scanner keyboardInput;
     private final Bank bank;
@@ -30,8 +30,9 @@ public class MainMenu {
         System.out.println("7. Transfer money between your accounts");
         System.out.println("8. Admin: Collect fee");
         System.out.println("9. Admin: Add interest payment");
-        System.out.println("10. Set password or PIN");
-        System.out.println("11. Exit the app");
+        System.out.println("10. Update personal information");
+        System.out.println("11. Set password or PIN");
+        System.out.println("12. Exit the app");
     }
 
     public int getUserSelection(int max) {
@@ -78,6 +79,7 @@ public class MainMenu {
                     addInterest();
                     break;
                 case 10:
+                    updatePersonalInformation();
                     setPasswordOrPin();
                     break;
                 case 11:
@@ -159,6 +161,16 @@ public class MainMenu {
         }
     }
 
+    public void updatePersonalInformation() {
+        keyboardInput.nextLine();
+        String address = readRequiredText("Enter your address: ");
+        String phoneNumber = readRequiredText("Enter your phone number: ");
+        String email = readRequiredText("Enter your email: ");
+
+        customer.updatePersonalInformation(address, phoneNumber, email);
+        System.out.println("Personal information updated successfully.");
+    }
+
     private BankAccount selectAccount(String action) {
         List<BankAccount> accounts = customer.getAccounts();
         if (accounts.isEmpty()) {
@@ -173,6 +185,15 @@ public class MainMenu {
         String history = account.getTransactionHistory();
         System.out.println("Transaction History:");
         System.out.println(history.isEmpty() ? "No transactions yet." : history);
+    }
+
+    private String readRequiredText(String prompt) {
+        String value = "";
+        while (value.trim().isEmpty()) {
+            System.out.print(prompt);
+            value = keyboardInput.nextLine();
+        }
+        return value.trim();
     }
 
     private void saveData() {
