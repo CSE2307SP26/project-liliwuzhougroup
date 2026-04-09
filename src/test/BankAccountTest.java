@@ -8,6 +8,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.junit.Assert.assertFalse;
 
 public class BankAccountTest {
 
@@ -48,7 +49,7 @@ public class BankAccountTest {
             // expected
         }
     }
-  
+
     @Test
     public void testCreateAccount() {
         BankAccount account = new BankAccount();
@@ -67,31 +68,30 @@ public class BankAccountTest {
         account.deposit(100);
         assertEquals(100, account.getBalance(), 0.01);
     }
-    
-    //transaction-history test
+
+    // transaction-history test
     @Test
     public void testTransactionHistoryStartsEmpty() {
-    BankAccount account = new BankAccount();
-    assertEquals("", account.getTransactionHistory());
+        BankAccount account = new BankAccount();
+        assertEquals("", account.getTransactionHistory());
     }
 
     @Test
     public void testTransactionHistoryAfterDeposit() {
-    BankAccount account = new BankAccount();
-    account.deposit(100);
-    assertEquals("Deposited: 100.0\n", account.getTransactionHistory());
+        BankAccount account = new BankAccount();
+        account.deposit(100);
+        assertEquals("Deposited: 100.0\n", account.getTransactionHistory());
     }
 
     @Test
     public void testTransactionHistoryAfterMultipleDeposits() {
-    BankAccount account = new BankAccount();
-    account.deposit(100);
-    account.deposit(50);
-    assertEquals("Deposited: 100.0\nDeposited: 50.0\n", account.getTransactionHistory());
+        BankAccount account = new BankAccount();
+        account.deposit(100);
+        account.deposit(50);
+        assertEquals("Deposited: 100.0\nDeposited: 50.0\n", account.getTransactionHistory());
     }
 
-
-    //withdrawTest
+    // withdrawTest
     @Test
     public void testWithdraw() {
         BankAccount account = new BankAccount();
@@ -140,6 +140,7 @@ public class BankAccountTest {
         } catch (IllegalArgumentException e) {
         }
     }
+
     @Test
     public void testAddInterest() {
         BankAccount account = new BankAccount();
@@ -231,7 +232,6 @@ public class BankAccountTest {
             assertEquals(e.getMessage(), "Transfer amount must be positive.");
         }
     }
-
     @Test
     public void testGetRemainingFeesStartsEmpty() {
         BankAccount account = new BankAccount();
@@ -250,5 +250,74 @@ public class BankAccountTest {
         assertEquals(25.0, fees.get(0).getAmount(), 0.001);
         assertEquals("Late fee", fees.get(0).getDescription());
     }
-}
 
+    // test for freeze and unfreeze account
+    @Test
+    public void testFreezeAccountBlocksDepositAndWithdraw() {
+        BankAccount account = new BankAccount();
+        account.freezeAccount();
+
+        assertTrue(account.isFrozen());
+
+        try {
+            account.deposit(50);
+            fail();
+        } catch (IllegalStateException e) {
+            assertEquals("This account is frozen. Transactions are not allowed.", e.getMessage());
+        }
+
+        try {
+            account.withdraw(20);
+            fail();
+        } catch (IllegalStateException e) {
+            assertEquals("This account is frozen. Transactions are not allowed.", e.getMessage());
+        }
+    }
+
+    // unfreeze account test
+    @Test
+    public void testUnfreezeAccountAllowsTransactionsAgain() {
+        BankAccount account = new BankAccount();
+        account.freezeAccount();
+        account.unfreezeAccount();
+
+        assertFalse(account.isFrozen());
+
+        account.deposit(100);
+        account.withdraw(40);
+
+        assertEquals(60, account.getBalance(), 0.01);
+    }
+
+    @Test
+    public void testSetMaxWithdrawAmount() {
+        BankAccount account = new BankAccount();
+        account.setMaxWithdrawAmount(200);
+        assertEquals(200, account.getMaxWithdrawAmount(), 0.01);
+    }
+
+    @Test
+    public void testWithdrawExceedsMaxWithdrawAmount() {
+        BankAccount account = new BankAccount();
+        account.deposit(500);
+        account.setMaxWithdrawAmount(100);
+
+        try {
+            account.withdraw(150);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Withdrawal amount exceeds the maximum amount", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testWithdrawWithinMaxWithdrawAmount() {
+        BankAccount account = new BankAccount();
+        account.deposit(500);
+        account.setMaxWithdrawAmount(100);
+
+        account.withdraw(80);
+
+        assertEquals(420, account.getBalance(), 0.01);
+    }
+}
