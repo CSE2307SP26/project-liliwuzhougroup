@@ -8,15 +8,30 @@ public class BankAccount implements Serializable {
 
     private double balance;
     private String transactionHistory;
+    private double maxWithdrawAmount;
 
     public BankAccount() {
         this.balance = 0;
         this.transactionHistory = "";
+        this.maxWithdrawAmount = Double.MAX_VALUE;
     }
 
     public BankAccount(double balance, String transactionHistory) {
         this.balance = balance;
         this.transactionHistory = transactionHistory == null ? "" : transactionHistory;
+        this.maxWithdrawAmount = Double.MAX_VALUE;
+    }
+
+    // add constructor with max withdraw amount
+    public BankAccount(double balance, String transactionHistory, double maxWithdrawAmount) {
+        this.balance = balance;
+        this.transactionHistory = transactionHistory == null ? "" : transactionHistory;
+
+        if (maxWithdrawAmount <= 0) {
+            this.maxWithdrawAmount = Double.MAX_VALUE;
+        } else {
+            this.maxWithdrawAmount = maxWithdrawAmount;
+        }
     }
 
     public void deposit(double amount) {
@@ -37,15 +52,15 @@ public class BankAccount implements Serializable {
         }
     }
 
-    //collect fee from the account, this will be used by the bank to collect fees for transactions
+    // collect fee from the account
     public void collectFee(double feeAmount) {
-    if (feeAmount > 0) {
-        this.balance -= feeAmount;
-        this.transactionHistory += "Fee collected: " + feeAmount + "\n";
-    } else {
-        throw new IllegalArgumentException();
+        if (feeAmount > 0) {
+            this.balance -= feeAmount;
+            this.transactionHistory += "Fee collected: " + feeAmount + "\n";
+        } else {
+            throw new IllegalArgumentException();
+        }
     }
-}
 
     public double getBalance() {
         return this.balance;
@@ -54,13 +69,36 @@ public class BankAccount implements Serializable {
     public String getTransactionHistory() {
         return this.transactionHistory;
     }
-    //withdraw
+
+
+    public double getMaxWithdrawAmount() {
+        return this.maxWithdrawAmount;
+    }
+
+    // set a max amount first
+    public void setMaxWithdrawAmount(double maxWithdrawAmount) {
+        if (maxWithdrawAmount <= 0) {
+            throw new IllegalArgumentException("Maximum withdrawal amount must be greater than 0.");
+        }
+
+        this.maxWithdrawAmount = maxWithdrawAmount;
+        this.transactionHistory += "Maximum withdrawal amount set to: " + maxWithdrawAmount + "\n";
+    }
+
+    // withdraw
     public void withdraw(double amount) {
         if (amount <= 0) {
             throw new IllegalArgumentException("Withdrawal amount must be greater than 0.");
-        }if (amount > balance) {
-            throw new IllegalArgumentException("You are overdrafting your account.");
         }
+
+        if (amount > maxWithdrawAmount) {
+            throw new IllegalArgumentException("Withdrawal amount exceeds the maximum amount");
+        }
+        // not enought balance
+        if (amount > balance) {
+            throw new IllegalArgumentException("Insufficient funds.");
+        }
+
         balance -= amount;
         this.transactionHistory += "Withdrew: " + amount + "\n";
     }

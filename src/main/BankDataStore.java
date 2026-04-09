@@ -121,6 +121,8 @@ public final class BankDataStore {
         Double balance = extractDoubleByKey(accountJson, "balance");
         String transactionHistory = extractStringByKey(accountJson, "transactionHistory");
 
+        Double maxWithdrawAmount = extractDoubleByKey(accountJson, "maxWithdrawAmount");
+
         if (balance == null) {
             return null;
         }
@@ -128,7 +130,12 @@ public final class BankDataStore {
             transactionHistory = "";
         }
 
-        return new BankAccount(balance.doubleValue(), transactionHistory);
+        if (maxWithdrawAmount == null || maxWithdrawAmount <= 0) {
+            maxWithdrawAmount = Double.MAX_VALUE;
+        }
+
+       
+        return new BankAccount(balance.doubleValue(), transactionHistory, maxWithdrawAmount.doubleValue());
     }
 
     private static String buildBankJson(Bank bank) {
@@ -150,7 +157,11 @@ public final class BankDataStore {
                 builder.append("          \"balance\": ").append(account.getBalance()).append(",\n");
                 builder.append("          \"transactionHistory\": \"")
                         .append(escapeJson(account.getTransactionHistory()))
-                        .append("\"\n");
+                        .append("\",\n");
+
+                // save maxWithdrawAmount into json
+                builder.append("          \"maxWithdrawAmount\": ").append(account.getMaxWithdrawAmount()).append("\n");
+
                 builder.append("        }");
                 if (j < accounts.size() - 1) {
                     builder.append(",");
