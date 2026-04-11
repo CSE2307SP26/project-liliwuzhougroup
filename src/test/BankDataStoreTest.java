@@ -22,7 +22,7 @@ public class BankDataStoreTest {
 
     @Test
     public void testSaveAndLoadBankPreservesCustomerData() throws IOException {
-        File tempFile = File.createTempFile("bank-data-store", ".json");
+        File tempFile = File.createTempFile("bank-data-store", ".dat");
         tempFile.deleteOnExit();
 
         Bank bank = new Bank();
@@ -85,7 +85,7 @@ public class BankDataStoreTest {
 
     @Test
     public void testLoadBankReturnsEmptyBankWhenFileDoesNotExist() {
-        File missingFile = new File("out/does-not-exist-" + System.nanoTime() + ".json");
+        File missingFile = new File("out/does-not-exist-" + System.nanoTime() + ".dat");
 
         Bank bank = BankDataStore.loadBank(missingFile);
 
