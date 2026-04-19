@@ -9,14 +9,13 @@ public class MainMenu {
     private static final int MAX_SELECTION = 3;
 
     private final Scanner keyboardInput;
+    private final MenuInput io;
     private final Bank bank;
 
     public MainMenu() {
         this.keyboardInput = new Scanner(System.in);
+        this.io = new MenuInput(keyboardInput);
         this.bank = BankDataStore.loadBank();
-        if (this.bank.getCustomers().isEmpty()) {
-            this.bank.addCustomer(new Customer("Default User"));
-        }
     }
 
     public void displayOptions() {
@@ -26,35 +25,17 @@ public class MainMenu {
         System.out.println("3. Exit the app");
     }
 
-    public int getUserSelection(int max) {
-        int selection = -1;
-        while (selection < 1 || selection > max) {
-            System.out.print("Please make a selection: ");
-            if (keyboardInput.hasNextInt()) {
-                selection = keyboardInput.nextInt();
-            } else {
-                keyboardInput.next();
-            }
-        }
-        return selection;
-    }
-
     public void processInput(int selection) {
         try {
-            switch (selection) {
-                case 1:
-                    runCustomerMenu();
-                    break;
-                case 2:
-                    runAdminMenu();
-                    break;
-                case 3:
-                    System.out.println("Thank you for using the 237 Bank App!");
-                    break;
-                default:
-                    System.out.println("Invalid selection.");
-                    break;
+            if (selection == 1) {
+                runCustomerMenu();
+                return;
             }
+            if (selection == 2) {
+                runAdminMenu();
+                return;
+            }
+            System.out.println("Thank you for using the 237 Bank App!");
         } catch (IllegalStateException e) {
             System.out.println(e.getMessage());
         }
@@ -64,15 +45,14 @@ public class MainMenu {
         int selection = -1;
         while (selection != EXIT_SELECTION) {
             displayOptions();
-            selection = getUserSelection(MAX_SELECTION);
+            selection = io.readSelection(MAX_SELECTION);
             processInput(selection);
         }
         saveData();
     }
 
     private void runCustomerMenu() {
-        Customer selectedCustomer = selectCustomer();
-        new CustomerMenu(bank, keyboardInput, selectedCustomer).run();
+        new CustomerAccessPortal(bank, keyboardInput).run();
     }
 
     private void runAdminMenu() {
@@ -82,17 +62,8 @@ public class MainMenu {
             System.out.println("Invalid admin password.");
             return;
         }
-        Customer defaultCustomer = bank.getCustomers().get(0);
-        new AdminMenu(bank, keyboardInput, defaultCustomer).run();
-    }
-
-    private Customer selectCustomer() {
-        System.out.println("Select customer:");
-        for (int i = 0; i < bank.getCustomers().size(); i++) {
-            System.out.println((i + 1) + ". " + bank.getCustomers().get(i).getName());
-        }
-        int selectedCustomer = getUserSelection(bank.getCustomers().size());
-        return bank.getCustomers().get(selectedCustomer - 1);
+        Customer adminContext = bank.getCustomers().isEmpty() ? null : bank.getCustomers().get(0);
+        new AdminMenu(bank, keyboardInput, adminContext).run();
     }
 
     public void viewAdminTransactionHistory() {
@@ -105,14 +76,14 @@ public class MainMenu {
         for (int i = 0; i < customers.size(); i++) {
             System.out.println((i + 1) + ". " + customers.get(i).getName());
         }
-        Customer selected = customers.get(getUserSelection(customers.size()) - 1);
+        Customer selected = customers.get(io.readSelection(customers.size()) - 1);
 
         List<BankAccount> accounts = selected.getAccounts();
         System.out.println("Select an account:");
         for (int i = 0; i < accounts.size(); i++) {
             System.out.println((i + 1) + ". Account #" + (i + 1) + " (Balance: " + accounts.get(i).getBalance() + ")");
         }
-        BankAccount account = accounts.get(getUserSelection(accounts.size()) - 1);
+        BankAccount account = accounts.get(io.readSelection(accounts.size()) - 1);
 
         String history = account.getTransactionHistory();
         System.out.println("Transaction History:");

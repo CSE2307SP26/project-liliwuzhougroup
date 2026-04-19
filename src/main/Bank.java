@@ -26,6 +26,19 @@ public class Bank implements Serializable {
         return Collections.unmodifiableList(customers);
     }
 
+    public Customer findCustomerByEmail(String email) {
+        String normalizedEmail = normalizeEmail(email);
+        if (normalizedEmail.isEmpty()) {
+            return null;
+        }
+        for (Customer customer : customers) {
+            if (normalizedEmail.equals(normalizeEmail(customer.getEmail()))) {
+                return customer;
+            }
+        }
+        return null;
+    }
+
     public void collectFee(BankAccount account, double feeAmount) {
         if (account == null) {
             throw new IllegalArgumentException("Account cannot be null.");
@@ -72,5 +85,9 @@ public class Bank implements Serializable {
             }
         }
         return historyBuilder.toString().trim();
+    }
+
+    private String normalizeEmail(String email) {
+        return email == null ? "" : email.trim().toLowerCase();
     }
 }
