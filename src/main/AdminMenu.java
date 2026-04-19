@@ -31,7 +31,7 @@ public class AdminMenu extends CustomerMenu {
         int selection = -1;
         while (selection != ADMIN_EXIT_SELECTION) {
             displayOptions();
-            selection = getUserSelection(ADMIN_MAX_SELECTION);
+            selection = io.readSelection(ADMIN_MAX_SELECTION);
             processInput(selection);
         }
     }
@@ -39,19 +39,19 @@ public class AdminMenu extends CustomerMenu {
     @Override
     public void displayOptions() {
         System.out.println("Admin Menu:");
-        System.out.println("1. Make a deposit");
-        System.out.println("2. Make a withdrawal");
-        System.out.println("3. Check account balance");
-        System.out.println("4. Check transaction history");
-        System.out.println("5. Create an additional account");
-        System.out.println("6. Close an existing account");
-        System.out.println("7. Transfer money between accounts");
+        System.out.println("1. Customer: Make a deposit");
+        System.out.println("2. Customer: Make a withdrawal");
+        System.out.println("3. Customer: Check account balance");
+        System.out.println("4. Customer: Check transaction history");
+        System.out.println("5. Customer: Create an additional account");
+        System.out.println("6. Customer: Close an existing account");
+        System.out.println("7. Customer: Transfer money between accounts");
         System.out.println("8. Admin: Collect fee");
         System.out.println("9. Admin: Add interest payment");
         System.out.println("10. Admin: Freeze account");
         System.out.println("11. Admin: Unfreeze account");
-        System.out.println("12. Set maximum withdrawal amount");
-        System.out.println("13. Manage recurring payments");
+        System.out.println("12. Customer: Set maximum withdrawal amount");
+        System.out.println("13. Customer: Manage recurring payments");
         System.out.println("14. Admin: View all account history");
         System.out.println("15. Back to main menu");
     }
@@ -59,65 +59,17 @@ public class AdminMenu extends CustomerMenu {
     @Override
     public void processInput(int selection) {
         try {
-            switch (selection) {
-                case 1:
-                    prepareCustomerForOperation("deposit into");
-                    performDeposit();
-                    break;
-                case 2:
-                    prepareCustomerForOperation("withdraw from");
-                    performWithdrawal();
-                    break;
-                case 3:
-                    prepareCustomerForOperation("check balance for");
-                    displayBalance();
-                    break;
-                case 4:
-                    prepareCustomerForOperation("view transaction history for");
-                    displayTransactionHistory();
-                    break;
-                case 5:
-                    prepareCustomerForOperation("create account for");
-                    createAdditionalAccount();
-                    break;
-                case 6:
-                    prepareCustomerForOperation("close account for");
-                    closeExistingAccount();
-                    break;
-                case 7:
-                    prepareCustomerForOperation("transfer between accounts for");
-                    transferBetweenAccounts();
-                    break;
-                case 8:
-                    collectFee();
-                    break;
-                case 9:
-                    addInterest();
-                    break;
-                case 10:
-                    freezeAccount();
-                    break;
-                case 11:
-                    unfreezeAccount();
-                    break;
-                case 12:
-                    prepareCustomerForOperation("set maximum withdrawal amount for");
-                    setMaximumWithdrawalAmount();
-                    break;
-                case 13:
-                    prepareCustomerForOperation("manage recurring payments for");
-                    manageRecurringPayments();
-                    break;
-                case 14:
-                    displayAllCustomersHistory();
-                    break;
-                case 15:
-                    System.out.println("Leaving admin menu.");
-                    break;
-                default:
-                    System.out.println("Invalid selection.");
-                    break;
+            if (selection == ADMIN_EXIT_SELECTION) {
+                System.out.println("Leaving admin menu.");
+                return;
             }
+            if (processCustomerSelection(selection)) {
+                return;
+            }
+            if (processAdminSelection(selection)) {
+                return;
+            }
+            System.out.println("Invalid selection.");
         } catch (IllegalStateException e) {
             System.out.println(e.getMessage());
         }
@@ -125,14 +77,14 @@ public class AdminMenu extends CustomerMenu {
 
     public void collectFee() {
         BankAccount account = selectAnyCustomerAccount("collect fee from");
-        double feeAmount = readPositiveAmount("Enter fee amount: ");
+        double feeAmount = io.readPositiveAmount("Enter fee amount: ");
         bank.collectFee(account, feeAmount);
         System.out.println("Fee collected successfully.");
     }
 
     public void addInterest() {
         BankAccount account = selectAnyCustomerAccount("add interest to");
-        double interestAmount = readPositiveAmount("Enter interest amount: ");
+        double interestAmount = io.readPositiveAmount("Enter interest amount: ");
         bank.addInterest(account, interestAmount);
         System.out.println("Interest added successfully.");
     }
@@ -158,15 +110,39 @@ public class AdminMenu extends CustomerMenu {
         System.out.println(allHistory.isEmpty() ? "No history available." : allHistory);
     }
 
+    private boolean processCustomerSelection(int selection) {
+        switch (selection) {
+            case 1: prepareCustomerForOperation("deposit into"); performDeposit(); return true;
+            case 2: prepareCustomerForOperation("withdraw from"); performWithdrawal(); return true;
+            case 3: prepareCustomerForOperation("check balance for"); displayBalance(); return true;
+            case 4: prepareCustomerForOperation("view transaction history for"); displayTransactionHistory(); return true;
+            case 5: prepareCustomerForOperation("create account for"); createAdditionalAccount(); return true;
+            case 6: prepareCustomerForOperation("close account for"); closeExistingAccount(); return true;
+            case 7: prepareCustomerForOperation("transfer between accounts for"); transferBetweenAccounts(); return true;
+            case 12: prepareCustomerForOperation("set maximum withdrawal amount for"); setMaximumWithdrawalAmount(); return true;
+            case 13: prepareCustomerForOperation("manage recurring payments for"); manageRecurringPayments(); return true;
+            default: return false;
+        }
+    }
+
+    private boolean processAdminSelection(int selection) {
+        switch (selection) {
+            case 8: collectFee(); return true;
+            case 9: addInterest(); return true;
+            case 10: freezeAccount(); return true;
+            case 11: unfreezeAccount(); return true;
+            case 14: displayAllCustomersHistory(); return true;
+            default: return false;
+        }
+    }
+
     private BankAccount selectAnyCustomerAccount(String action) {
-        Customer chosenCustomer = selectCustomer("choose account to " + action);
-        setCustomer(chosenCustomer);
-        return selectAccount(action);
+        setCustomer(selectCustomer("choose account to " + action));
+        return accountSelector.selectAccount(customer, action);
     }
 
     private void prepareCustomerForOperation(String action) {
-        Customer chosenCustomer = selectCustomer(action);
-        setCustomer(chosenCustomer);
+        setCustomer(selectCustomer(action));
     }
 
     private Customer selectCustomer(String action) {
@@ -178,7 +154,7 @@ public class AdminMenu extends CustomerMenu {
         for (int i = 0; i < customers.size(); i++) {
             System.out.println((i + 1) + ". " + customers.get(i).getName());
         }
-        int selectedCustomer = getUserSelection(customers.size());
+        int selectedCustomer = io.readSelection(customers.size());
         return customers.get(selectedCustomer - 1);
     }
 }

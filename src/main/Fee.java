@@ -1,5 +1,6 @@
 package main;
 
+import java.util.Calendar;
 import java.util.Date;
 
 public class Fee {
@@ -19,7 +20,7 @@ public class Fee {
         }
         this.amount = amount;
         this.description = description.trim();
-        if (dueDate.before(new Date())) {
+        if (dueDate.before(getStartOfToday())) {
             throw new IllegalArgumentException("Due date cannot be in the past.");
         }
         this.dueDate = dueDate;
@@ -35,5 +36,14 @@ public class Fee {
 
     public Date getDueDate() {
         return dueDate;
+    }
+
+    private Date getStartOfToday() {
+        Calendar today = Calendar.getInstance();
+        today.set(Calendar.HOUR_OF_DAY, 0);
+        today.set(Calendar.MINUTE, 0);
+        today.set(Calendar.SECOND, 0);
+        today.set(Calendar.MILLISECOND, 0);
+        return today.getTime();
     }
 }

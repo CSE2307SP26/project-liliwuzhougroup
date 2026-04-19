@@ -149,6 +149,9 @@ public class BankAccount implements Serializable {
         if (targetAccount == null) {
             throw new IllegalArgumentException("Source and target accounts cannot be null.");
         }
+        if (targetAccount == this) {
+            throw new IllegalArgumentException("Source and target accounts must be different.");
+        }
         if (targetAccount.isFrozen()) {
             throw new IllegalStateException("You cannot transfer money into a frozen account.");
         }
