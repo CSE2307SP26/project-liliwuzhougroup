@@ -21,7 +21,7 @@ final class CustomerAccountSelector {
         return account;
     }
 
-    private void displayAccounts(List<BankAccount> accounts) {
+    void displayAccounts(List<BankAccount> accounts) {
         for (int i = 0; i < accounts.size(); i++) {
             BankAccount account = accounts.get(i);
             String status = account.isFrozen() ? "Frozen" : "Active";
@@ -32,7 +32,7 @@ final class CustomerAccountSelector {
         }
     }
 
-    private void displayRemainingFees(BankAccount account) {
+    void displayRemainingFees(BankAccount account) {
         for (Fee fee : account.getRemainingFees()) {
             System.out.println("You have " + fee.getAmount() + " due for "
                     + fee.getDescription() + " on " + fee.getDueDate() + ".");

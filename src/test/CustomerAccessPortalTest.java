@@ -24,7 +24,7 @@ public class CustomerAccessPortalTest {
                 "5551234567",
                 "password123",
                 "2",
-                "11",
+                "6",
                 "3"
         ) + System.lineSeparator();
 
