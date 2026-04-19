@@ -129,10 +129,16 @@ public class CustomerMenu {
     }
 
     public void transferBetweenAccounts() {
+        if (customer.getAccounts().size() < 2) {
+            throw new IllegalStateException("At least two accounts are required to transfer money.");
+        }
         System.out.println("Select source account:");
         BankAccount sourceAccount = accountSelector.selectAccount(customer, "transfer money from");
         System.out.println("Select target account:");
         BankAccount targetAccount = accountSelector.selectAccount(customer, "transfer money to");
+        if (sourceAccount == targetAccount) {
+            throw new IllegalArgumentException("Source and target accounts must be different.");
+        }
         double amount = io.readPositiveAmount("How much would you like to transfer: ");
 
         try {

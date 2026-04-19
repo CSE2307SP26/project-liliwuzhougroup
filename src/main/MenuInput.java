@@ -10,6 +10,9 @@ final class MenuInput {
     }
 
     int readSelection(int max) {
+        if (max < 1) {
+            throw new IllegalArgumentException("At least one selection must be available.");
+        }
         int selection = -1;
         while (selection < 1 || selection > max) {
             System.out.print("Please make a selection: ");
@@ -53,6 +56,9 @@ final class MenuInput {
         while (!pin.matches("\\d{4}")) {
             System.out.print(prompt);
             pin = keyboardInput.nextLine().trim();
+            if (!pin.matches("\\d{4}")) {
+                System.out.println("PIN must be exactly 4 digits.");
+            }
         }
         return pin;
     }

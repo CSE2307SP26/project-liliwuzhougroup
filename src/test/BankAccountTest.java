@@ -225,9 +225,9 @@ public class BankAccountTest {
         sourceAccount.deposit(100);
         try {
             sourceAccount.transferMoney(sourceAccount, 50);
-            sourceAccount.transferMoney(sourceAccount, 50);
-        } catch (IllegalArgumentException e) {
             fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Source and target accounts must be different.", e.getMessage());
         }
     }
 

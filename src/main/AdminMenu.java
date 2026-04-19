@@ -39,19 +39,19 @@ public class AdminMenu extends CustomerMenu {
     @Override
     public void displayOptions() {
         System.out.println("Admin Menu:");
-        System.out.println("1. Make a deposit");
-        System.out.println("2. Make a withdrawal");
-        System.out.println("3. Check account balance");
-        System.out.println("4. Check transaction history");
-        System.out.println("5. Create an additional account");
-        System.out.println("6. Close an existing account");
-        System.out.println("7. Transfer money between accounts");
+        System.out.println("1. Customer: Make a deposit");
+        System.out.println("2. Customer: Make a withdrawal");
+        System.out.println("3. Customer: Check account balance");
+        System.out.println("4. Customer: Check transaction history");
+        System.out.println("5. Customer: Create an additional account");
+        System.out.println("6. Customer: Close an existing account");
+        System.out.println("7. Customer: Transfer money between accounts");
         System.out.println("8. Admin: Collect fee");
         System.out.println("9. Admin: Add interest payment");
         System.out.println("10. Admin: Freeze account");
         System.out.println("11. Admin: Unfreeze account");
-        System.out.println("12. Set maximum withdrawal amount");
-        System.out.println("13. Manage recurring payments");
+        System.out.println("12. Customer: Set maximum withdrawal amount");
+        System.out.println("13. Customer: Manage recurring payments");
         System.out.println("14. Admin: View all account history");
         System.out.println("15. Back to main menu");
     }
