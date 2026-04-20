@@ -6,8 +6,8 @@ import java.util.Scanner;
 public class CustomerMenu {
 
     private static final int DASHBOARD_OPTION_COUNT = 5;
-    private static final int ACCOUNT_MENU_EXIT_SELECTION = 8;
-    private static final int ACCOUNT_MENU_MAX_SELECTION = 8;
+    private static final int ACCOUNT_MENU_EXIT_SELECTION = 9;
+    private static final int ACCOUNT_MENU_MAX_SELECTION = 9;
 
     protected final Scanner keyboardInput;
     protected final Bank bank;
@@ -198,6 +198,29 @@ public class CustomerMenu {
         }
     }
 
+    public void payPendingFee(BankAccount account) {
+        List<Fee> fees = account.getRemainingFees();
+        if (fees.isEmpty()) {
+            throw new IllegalStateException("There are no pending fees to pay.");
+        }
+
+        System.out.println("Select a fee to pay:");
+        for (int i = 0; i < fees.size(); i++) {
+            Fee fee = fees.get(i);
+            System.out.println((i + 1) + ". " + fee.getDescription()
+                    + " - Amount: " + fee.getAmount()
+                    + ", Due: " + fee.getDueDate());
+        }
+
+        int selectedFee = io.readSelection(fees.size()) - 1;
+        try {
+            account.payFee(selectedFee);
+            System.out.println("Fee paid successfully.");
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
     public void manageRecurringPayments() {
         new RecurringPaymentMenu(keyboardInput, customer).run();
     }
@@ -247,8 +270,9 @@ public class CustomerMenu {
         System.out.println("4. Check transaction history");
         System.out.println("5. Transfer money from this account");
         System.out.println("6. Set maximum withdrawal amount");
-        System.out.println("7. Close this account");
-        System.out.println("8. Back to account dashboard");
+        System.out.println("7. Pay a pending fee");
+        System.out.println("8. Close this account");
+        System.out.println("9. Back to account dashboard");
     }
 
     private boolean processAccountSelection(BankAccount account, int selection) {
@@ -259,7 +283,8 @@ public class CustomerMenu {
             case 4: displayTransactionHistory(account); return false;
             case 5: transferBetweenAccounts(account); return false;
             case 6: setMaximumWithdrawalAmount(account); return false;
-            case 7:
+            case 7: payPendingFee(account); return false;
+            case 8:
                 closeExistingAccount(account);
                 return !customer.getAccounts().contains(account);
             case ACCOUNT_MENU_EXIT_SELECTION:

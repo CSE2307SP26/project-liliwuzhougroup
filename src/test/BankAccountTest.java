@@ -290,6 +290,59 @@ public class BankAccountTest {
     }
 
     @Test
+    public void testPayFeeRemovesFeeAndUpdatesBalanceAndHistory() {
+        BankAccount account = new BankAccount();
+        account.deposit(100.0);
+        account.createFee(new Fee(25.0, "Late fee", new Date(System.currentTimeMillis() + 86400000)));
+
+        account.payFee(0);
+
+        assertEquals(75.0, account.getBalance(), 0.001);
+        assertTrue(account.getRemainingFees().isEmpty());
+        assertTrue(account.getTransactionHistory().contains("Paid fee: 25.0 for Late fee"));
+    }
+
+    @Test
+    public void testPayFeeRejectsWhenNoFeesExist() {
+        BankAccount account = new BankAccount();
+
+        try {
+            account.payFee(0);
+            fail();
+        } catch (IllegalStateException e) {
+            assertEquals("There are no pending fees to pay.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testPayFeeRejectsInvalidSelection() {
+        BankAccount account = new BankAccount();
+        account.deposit(100.0);
+        account.createFee(new Fee(25.0, "Late fee", new Date(System.currentTimeMillis() + 86400000)));
+
+        try {
+            account.payFee(1);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Invalid fee selection.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testPayFeeRejectsWhenBalanceIsTooLow() {
+        BankAccount account = new BankAccount();
+        account.deposit(10.0);
+        account.createFee(new Fee(25.0, "Late fee", new Date(System.currentTimeMillis() + 86400000)));
+
+        try {
+            account.payFee(0);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Insufficient funds to pay this fee.", e.getMessage());
+        }
+    }
+
+    @Test
     public void testGetRemainingFeesReturnsCopy() {
         BankAccount account = new BankAccount();
         Fee fee = new Fee(25.0, "Late fee", new Date(System.currentTimeMillis() + 86400000));

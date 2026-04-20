@@ -45,7 +45,8 @@ public class CustomerDashboardMenuTest {
         String input = String.join(System.lineSeparator(),
                 "1",
                 "50",
-                "8"
+                "9",
+                "9"
         ) + System.lineSeparator();
         CustomerMenu menu = new CustomerMenu(
                 new Bank(),
@@ -65,5 +66,38 @@ public class CustomerDashboardMenuTest {
         assertEquals(50.0, customer.getAccounts().get(0).getBalance(), 0.001);
         assertTrue(output.toString().contains("Account #1 Menu:"));
         assertTrue(output.toString().contains("Deposit successful."));
+    }
+
+    @Test
+    public void testSelectingAnAccountAllowsPayingPendingFee() {
+        Customer customer = new Customer("Ava");
+        customer.getAccounts().get(0).deposit(100.0);
+        customer.getAccounts().get(0).createFee(
+                new main.Fee(20.0, "Service fee", new java.util.Date(System.currentTimeMillis() + 86400000))
+        );
+        String input = String.join(System.lineSeparator(),
+                "7",
+                "1",
+                "9",
+                "9"
+        ) + System.lineSeparator();
+        CustomerMenu menu = new CustomerMenu(
+                new Bank(),
+                new Scanner(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))),
+                customer
+        );
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        PrintStream originalOutput = System.out;
+
+        try {
+            System.setOut(new PrintStream(output));
+            menu.processInput(1);
+        } finally {
+            System.setOut(originalOutput);
+        }
+
+        assertEquals(80.0, customer.getAccounts().get(0).getBalance(), 0.001);
+        assertTrue(customer.getAccounts().get(0).getRemainingFees().isEmpty());
+        assertTrue(output.toString().contains("Fee paid successfully."));
     }
 }
