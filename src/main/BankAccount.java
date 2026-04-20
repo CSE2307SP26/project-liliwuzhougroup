@@ -173,6 +173,25 @@ public class BankAccount implements Serializable {
         this.fees.add(fee);
     }
 
+    public void payFee(int feeIndex) {
+        ensureAccountIsActive();
+        if (fees.isEmpty()) {
+            throw new IllegalStateException("There are no pending fees to pay.");
+        }
+        if (feeIndex < 0 || feeIndex >= fees.size()) {
+            throw new IllegalArgumentException("Invalid fee selection.");
+        }
+
+        Fee fee = fees.get(feeIndex);
+        if (fee.getAmount() > balance) {
+            throw new IllegalArgumentException("Insufficient funds to pay this fee.");
+        }
+
+        balance -= fee.getAmount();
+        fees.remove(feeIndex);
+        this.transactionHistory += "Paid fee: " + fee.getAmount() + " for " + fee.getDescription() + "\n";
+    }
+
     public List<Fee> getRemainingFees() {
         return new ArrayList<>(this.fees);
     }
