@@ -5,6 +5,8 @@ import main.BankAccount;
 import main.Customer;
 import org.junit.Test;
 
+import java.util.Date;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
@@ -38,6 +40,20 @@ public class BankTest {
         account.deposit(100.0);
         bank.addInterest(account, 5.0);
         assertEquals(105.0, account.getBalance(), 0.001);
+    }
+
+    @Test
+    public void testCreatePendingFeeAddsFeeToAccount() {
+        Bank bank = new Bank();
+        BankAccount account = new BankAccount();
+        Date tomorrow = new Date(System.currentTimeMillis() + 86400000);
+
+        bank.createPendingFee(account, 12.5, "Service fee", tomorrow);
+
+        assertEquals(1, account.getRemainingFees().size());
+        assertEquals(12.5, account.getRemainingFees().get(0).getAmount(), 0.001);
+        assertEquals("Service fee", account.getRemainingFees().get(0).getDescription());
+        assertEquals(tomorrow, account.getRemainingFees().get(0).getDueDate());
     }
 
     @Test
@@ -104,6 +120,18 @@ public class BankTest {
 
         try {
             bank.addInterest(null, 5.0);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Account cannot be null.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testCreatePendingFeeRejectsNullAccount() {
+        Bank bank = new Bank();
+
+        try {
+            bank.createPendingFee(null, 5.0, "Service fee", new Date(System.currentTimeMillis() + 86400000));
             fail();
         } catch (IllegalArgumentException e) {
             assertEquals("Account cannot be null.", e.getMessage());

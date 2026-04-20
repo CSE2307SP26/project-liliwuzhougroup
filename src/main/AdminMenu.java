@@ -1,12 +1,16 @@
 package main;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeParseException;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
 public class AdminMenu extends CustomerMenu {
 
-    private static final int ADMIN_EXIT_SELECTION = 15;
-    private static final int ADMIN_MAX_SELECTION = 15;
+    private static final int ADMIN_EXIT_SELECTION = 16;
+    private static final int ADMIN_MAX_SELECTION = 16;
 
     public AdminMenu(Bank bank, Customer customer) {
         this(bank, new Scanner(System.in), customer);
@@ -52,8 +56,9 @@ public class AdminMenu extends CustomerMenu {
         System.out.println("11. Admin: Unfreeze account");
         System.out.println("12. Customer: Set maximum withdrawal amount");
         System.out.println("13. Customer: Manage recurring payments");
-        System.out.println("14. Admin: View all account history");
-        System.out.println("15. Back to main menu");
+        System.out.println("14. Admin: Create pending fee");
+        System.out.println("15. Admin: View all account history");
+        System.out.println("16. Back to main menu");
     }
 
     @Override
@@ -101,6 +106,16 @@ public class AdminMenu extends CustomerMenu {
         System.out.println("Account unfrozen successfully.");
     }
 
+    public void createPendingFee() {
+        BankAccount account = selectAnyCustomerAccount("create pending fee for");
+        io.prepareForTextInput();
+        String description = io.readRequiredText("Enter fee description: ");
+        Date dueDate = readFeeDueDate();
+        double feeAmount = io.readPositiveAmount("Enter fee amount: ");
+        bank.createPendingFee(account, feeAmount, description, dueDate);
+        System.out.println("Pending fee created successfully.");
+    }
+
     public String getAllCustomersHistory() {
         return bank.getAllCustomersHistory();
     }
@@ -131,8 +146,21 @@ public class AdminMenu extends CustomerMenu {
             case 9: addInterest(); return true;
             case 10: freezeAccount(); return true;
             case 11: unfreezeAccount(); return true;
-            case 14: displayAllCustomersHistory(); return true;
+            case 14: createPendingFee(); return true;
+            case 15: displayAllCustomersHistory(); return true;
             default: return false;
+        }
+    }
+
+    private Date readFeeDueDate() {
+        while (true) {
+            String rawDate = io.readRequiredText("Enter fee due date (yyyy-MM-dd): ");
+            try {
+                LocalDate parsedDate = LocalDate.parse(rawDate);
+                return Date.from(parsedDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid date format. Please use yyyy-MM-dd.");
+            }
         }
     }
 
