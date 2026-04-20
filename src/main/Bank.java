@@ -3,6 +3,7 @@ package main;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 public class Bank implements Serializable {
@@ -51,6 +52,13 @@ public class Bank implements Serializable {
             throw new IllegalArgumentException("Account cannot be null.");
         }
         account.addInterest(interestAmount);
+    }
+
+    public void createPendingFee(BankAccount account, double feeAmount, String description, Date dueDate) {
+        if (account == null) {
+            throw new IllegalArgumentException("Account cannot be null.");
+        }
+        account.createFee(new Fee(feeAmount, description, dueDate));
     }
 
     public void freezeAccount(BankAccount account) {
