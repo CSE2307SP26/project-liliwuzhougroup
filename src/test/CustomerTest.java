@@ -7,6 +7,7 @@ import main.RecurringPayment.Frequency;
 import org.junit.Test;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -17,13 +18,65 @@ import static org.junit.Assert.fail;
 public class CustomerTest {
 
     @Test
+    public void testCustomerRejectsBlankName() {
+        try {
+            new Customer("   ");
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Name cannot be empty.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testCustomerWithEmptyAccountsStillGetsDefaultAccount() {
+        Customer customer = new Customer("Ava", Collections.emptyList());
+
+        assertEquals(1, customer.getAccounts().size());
+    }
+
+    @Test
+    public void testUnsetCredentialsDoNotAuthenticate() {
+        Customer customer = new Customer("Ava");
+
+        assertFalse(customer.verifyPassword("password123"));
+        assertFalse(customer.verifyPin("1234"));
+    }
+
+    @Test
     public void testUpdatePersonalInformation() {
         Customer customer = new Customer("Nick");
-        customer.updatePersonalInformation("123 Main St", "5551234567", "Nick@test.com");
+        customer.updatePersonalInformation("123 Main St", "(555) 123-4567", "Nick@test.com");
 
         assertEquals("123 Main St", customer.getAddress());
         assertEquals("5551234567", customer.getPhoneNumber());
         assertEquals("Nick@test.com", customer.getEmail());
+    }
+
+    @Test
+    public void testUpdatePersonalInformationRejectsInvalidPhoneNumber() {
+        Customer customer = new Customer("Nick");
+
+        try {
+            customer.updatePersonalInformation("123 Main St", "555-12", "Nick@test.com");
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Phone number must contain exactly 10 digits.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testUpdatePersonalInformationRejectsPhoneNumberWithLetters() {
+        Customer customer = new Customer("Nick");
+
+        try {
+            customer.updatePersonalInformation("123 Main St", "555-ABC-1212", "Nick@test.com");
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals(
+                    "Phone number can contain only digits, spaces, parentheses, and hyphens.",
+                    e.getMessage()
+            );
+        }
     }
 
     @Test
