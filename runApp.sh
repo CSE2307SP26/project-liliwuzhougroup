@@ -1,7 +1,9 @@
 #!/bin/bash
-javac src/main/*.java
-java -cp src main.MainMenu
-#put commands here to compile and run your app from command line
-# run this if you want to directly use the function in terminal (two separate line, run at the same time):
-# chmod +x runApp.sh
-# ./runApp.sh
+set -e
+
+ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
+OUT_DIR="$ROOT_DIR/out/app"
+
+mkdir -p "$OUT_DIR"
+javac -d "$OUT_DIR" "$ROOT_DIR"/src/main/*.java
+java -cp "$OUT_DIR" main.MainMenu
