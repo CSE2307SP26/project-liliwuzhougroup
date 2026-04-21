@@ -17,19 +17,25 @@ This project is a console-based banking application written in Java. It supports
 2. A bank customer can withdraw from an account.
 3. A bank customer can check an account balance.
 4. A bank customer can view transaction history for an account.
-5. A bank customer can create an additional account.
+5. A bank customer can create an additional account with the bank.
 6. A bank customer can close an existing account.
-7. A bank customer can transfer money between accounts.
+7. A bank customer can transfer money from one account to another.
 8. A bank administrator can collect fees from existing accounts.
-9. A bank administrator can add interest to an existing account.
-10. A bank administrator can log in to perform admin-only actions.
-11. A bank customer can receive pending-fee notifications while using the account menus.
-12. A bank administrator can view transaction history for a specific customer account.
-13. A bank customer can set up recurring payments between accounts.
-14. A bank administrator can freeze or unfreeze an account.
-15. A bank customer can set a maximum withdrawal amount.
-16. A bank customer can set a password or PIN for account security.
+9. A bank administrator can add an interest payment to an existing account.
+10. A bank customer can set up an automatic recurring payment to another account.
+11. A bank administrator can log in and perform admin-only actions.
+12. A bank customer can set a maximum withdrawal amount for an account.
+13. A bank administrator can see all transactions for a particular account.
+14. A bank administrator can freeze or unfreeze a customer account.
+15. A bank customer can set a password or PIN for account security.
+16. A bank customer can receive notifications when a fee is pending before its due date.
 17. A bank customer can update personal information.
+18. A bank user can see all account information in an account dashboard after logging in.
+19. A new user can register as a bank customer and create an initial account.
+20. A bank customer can view monthly account statements.
+21. A bank administrator can create a pending fee for a customer account.
+22. A bank customer can pay a pending fee.
+23. A bank customer can receive a warning when a transaction would cause low balance or overdraft risk.
 
 ## Run the Application
 
