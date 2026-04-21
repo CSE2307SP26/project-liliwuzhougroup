@@ -4,8 +4,12 @@ import java.util.List;
 import java.util.Scanner;
 
 public class RecurringPaymentMenu {
-    private static final int EXIT_SELECTION = 5;
-    private static final int MAX_SELECTION = 5;
+    private static final int BACK_SELECTION = 5;
+    private static final int EXIT_SELECTION = 6;
+    private static final int MAX_SELECTION = 6;
+    private static final String SETUP_REQUIRES_TWO_ACCOUNTS_MESSAGE =
+            "Recurring payments require at least two accounts. "
+                    + "Create another account from the customer dashboard first.";
 
     private final MenuInput io;
     private final Customer customer;
@@ -17,7 +21,7 @@ public class RecurringPaymentMenu {
 
     public void run() {
         int selection = -1;
-        while (selection != EXIT_SELECTION) {
+        while (selection != BACK_SELECTION) {
             displayOptions();
             selection = io.readSelection(MAX_SELECTION);
             processInput(selection);
@@ -25,18 +29,32 @@ public class RecurringPaymentMenu {
     }
 
     public void displayOptions() {
+        MenuScreen.redraw();
         System.out.println("\n--- Recurring Payments ---");
-        System.out.println("1. Set up a new recurring payment");
+        if (canSetupPayment()) {
+            System.out.println("1. Set up a new recurring payment");
+        } else {
+            System.out.println("1. Set up a new recurring payment (requires at least 2 accounts)");
+        }
         System.out.println("2. View all recurring payments");
         System.out.println("3. Process all recurring payments now");
         System.out.println("4. Cancel a recurring payment");
-        System.out.println("5. Back to main menu");
+        System.out.println("5. Back to previous menu");
+        System.out.println("6. Exit the app");
     }
 
     public void processInput(int selection) {
         try {
+            if (selection == BACK_SELECTION) {
+                System.out.println("Returning to previous menu.");
+                return;
+            }
             if (selection == EXIT_SELECTION) {
-                System.out.println("Leaving recurring payment menu.");
+                AppExit.request();
+                return;
+            }
+            if (selection == 1 && !canSetupPayment()) {
+                System.out.println(SETUP_REQUIRES_TWO_ACCOUNTS_MESSAGE);
                 return;
             }
             if (runPaymentAction(selection)) {
@@ -104,6 +122,10 @@ public class RecurringPaymentMenu {
             case 4: cancelPayment(); return true;
             default: return false;
         }
+    }
+
+    private boolean canSetupPayment() {
+        return customer.getAccounts().size() >= 2;
     }
 
     private int selectAccountIndex(List<BankAccount> accounts, String prompt) {
