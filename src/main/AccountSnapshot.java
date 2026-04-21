@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 final class AccountSnapshot implements Serializable {
-    private static final long serialVersionUID = 2L;
+    private static final long serialVersionUID = 1L;
 
     private final double balance;
     private final String transactionHistory;
@@ -42,6 +42,9 @@ final class AccountSnapshot implements Serializable {
     }
 
     private void restoreTransactions(BankAccount account) {
+        if (transactions == null) {
+            return;
+        }
         for (Transaction t : transactions) {
             account.addTransactionRecord(t);
         }

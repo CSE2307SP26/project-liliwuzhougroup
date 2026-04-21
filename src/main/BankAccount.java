@@ -69,8 +69,7 @@ public class BankAccount implements Serializable {
         ensureAccountIsActive();
         if (amount > 0) {
             this.balance += amount;
-            this.transactionHistory += "Deposited: " + amount + "\n";
-            this.transactions.add(new Transaction(LocalDate.now(), "Deposited: " + amount, amount));
+            recordTransaction("Deposited: " + amount, amount);
         } else {
             throw new IllegalArgumentException("Deposit amount must be greater than 0.");
         }
@@ -79,8 +78,7 @@ public class BankAccount implements Serializable {
     public void addInterest(double interestAmount) {
         if (interestAmount > 0) {
             this.balance += interestAmount;
-            this.transactionHistory += "Interest added: " + interestAmount + "\n";
-            this.transactions.add(new Transaction(LocalDate.now(), "Interest added: " + interestAmount, interestAmount));
+            recordTransaction("Interest added: " + interestAmount, interestAmount);
         } else {
             throw new IllegalArgumentException("Interest amount must be greater than 0.");
         }
@@ -89,8 +87,7 @@ public class BankAccount implements Serializable {
     public void collectFee(double feeAmount) {
         if (feeAmount > 0) {
             this.balance -= feeAmount;
-            this.transactionHistory += "Fee collected: " + feeAmount + "\n";
-            this.transactions.add(new Transaction(LocalDate.now(), "Fee collected: " + feeAmount, -feeAmount));
+            recordTransaction("Fee collected: " + feeAmount, -feeAmount);
         } else {
             throw new IllegalArgumentException("Fee amount must be greater than 0.");
         }
@@ -113,8 +110,7 @@ public class BankAccount implements Serializable {
             throw new IllegalStateException("This account is already frozen.");
         }
         this.frozen = true;
-        this.transactionHistory += "Account frozen.\n";
-        this.transactions.add(new Transaction(LocalDate.now(), "Account frozen", 0.0));
+        recordTransaction("Account frozen.", 0.0);
     }
 
     public void unfreezeAccount() {
@@ -122,8 +118,7 @@ public class BankAccount implements Serializable {
             throw new IllegalStateException("This account is not frozen.");
         }
         this.frozen = false;
-        this.transactionHistory += "Account unfrozen.\n";
-        this.transactions.add(new Transaction(LocalDate.now(), "Account unfrozen", 0.0));
+        recordTransaction("Account unfrozen.", 0.0);
     }
 
     public double getMaxWithdrawAmount() {
@@ -136,8 +131,7 @@ public class BankAccount implements Serializable {
         }
 
         this.maxWithdrawAmount = maxWithdrawAmount;
-        this.transactionHistory += "Maximum withdrawal amount set to: " + maxWithdrawAmount + "\n";
-        this.transactions.add(new Transaction(LocalDate.now(), "Maximum withdrawal amount set to: " + maxWithdrawAmount, 0.0));
+        recordTransaction("Maximum withdrawal amount set to: " + maxWithdrawAmount, 0.0);
     }
 
     public void withdraw(double amount) {
@@ -154,8 +148,7 @@ public class BankAccount implements Serializable {
             throw new IllegalArgumentException("Insufficient funds.");
         }
         balance -= amount;
-        this.transactionHistory += "Withdrew: " + amount + "\n";
-        this.transactions.add(new Transaction(LocalDate.now(), "Withdrew: " + amount, -amount));
+        recordTransaction("Withdrew: " + amount, -amount);
     }
 
     public void transferMoney(BankAccount targetAccount, double amount) {
@@ -204,8 +197,7 @@ public class BankAccount implements Serializable {
 
         balance -= fee.getAmount();
         fees.remove(feeIndex);
-        this.transactionHistory += "Paid fee: " + fee.getAmount() + " for " + fee.getDescription() + "\n";
-        this.transactions.add(new Transaction(LocalDate.now(), "Paid fee: " + fee.getAmount() + " for " + fee.getDescription(), -fee.getAmount()));
+        recordTransaction("Paid fee: " + fee.getAmount() + " for " + fee.getDescription(), -fee.getAmount());
     }
 
     public List<Fee> getRemainingFees() {
@@ -227,7 +219,15 @@ public class BankAccount implements Serializable {
     }
 
     void addTransactionRecord(Transaction t) {
+        if (t == null) {
+            throw new IllegalArgumentException("Transaction cannot be null.");
+        }
         this.transactions.add(t);
+    }
+
+    private void recordTransaction(String description, double amount) {
+        this.transactionHistory += description + "\n";
+        this.transactions.add(new Transaction(LocalDate.now(), description, amount));
     }
 
     private void ensureAccountIsActive() {

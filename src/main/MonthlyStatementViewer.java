@@ -1,7 +1,5 @@
 package main;
 
-import java.io.Serializable;
-import java.time.LocalDate;
 import java.time.Month;
 import java.util.List;
 import java.util.Scanner;
@@ -59,37 +57,5 @@ public class MonthlyStatementViewer {
         System.out.println("Total credits:  " + totalCredits);
         System.out.println("Total debits:   " + totalDebits);
         System.out.println("Net change:     " + (totalCredits - totalDebits));
-    }
-}
-
-class Transaction implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
-    private final LocalDate date;
-    private final String description;
-    private final double amount;
-
-    Transaction(LocalDate date, String description, double amount) {
-        this.date = date;
-        this.description = description;
-        this.amount = amount;
-    }
-
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public double getAmount() {
-        return amount;
-    }
-
-    @Override
-    public String toString() {
-        return date + " | " + description + " | $" + amount;
     }
 }
