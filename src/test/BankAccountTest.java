@@ -74,6 +74,14 @@ public class BankAccountTest {
     }
 
     @Test
+    public void testDefaultMaxWithdrawAmountStartsAtZero() {
+        BankAccount account = new BankAccount();
+
+        assertEquals(0, account.getMaxWithdrawAmount(), 0.01);
+        assertEquals("0", account.getDisplayMaxWithdrawAmount());
+    }
+
+    @Test
     public void testBalanceAfterDeposit() {
         BankAccount account = new BankAccount();
         account.deposit(100);
@@ -397,6 +405,15 @@ public class BankAccountTest {
         BankAccount account = new BankAccount();
         account.setMaxWithdrawAmount(200);
         assertEquals(200, account.getMaxWithdrawAmount(), 0.01);
+        assertEquals("200", account.getDisplayMaxWithdrawAmount());
+    }
+
+    @Test
+    public void testLegacyUnlimitedValueIsNormalizedToZero() {
+        BankAccount account = new BankAccount(0, "", false, Double.MAX_VALUE);
+
+        assertEquals(0, account.getMaxWithdrawAmount(), 0.01);
+        assertEquals("0", account.getDisplayMaxWithdrawAmount());
     }
 
     @Test
