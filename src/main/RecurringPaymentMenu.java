@@ -50,7 +50,7 @@ public class RecurringPaymentMenu {
                 return;
             }
             if (selection == EXIT_SELECTION) {
-                AppExit.request();
+                MainMenu.requestExit();
                 return;
             }
             if (selection == 1 && !canSetupPayment()) {

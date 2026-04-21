@@ -33,7 +33,7 @@ public class MainMenu {
                 runAdminMenu();
                 return;
             }
-            AppExit.request();
+            requestExit();
         } catch (IllegalStateException e) {
             System.out.println(e.getMessage());
         }
@@ -45,11 +45,16 @@ public class MainMenu {
                 displayOptions();
                 processInput(io.readSelection(MAX_SELECTION));
             }
-        } catch (AppExit.Requested e) {
+        } catch (ExitRequested e) {
             // Exit requested from any menu level.
         } finally {
             saveData();
         }
+    }
+
+    public static void requestExit() {
+        System.out.println("Thank you for using the 237 Bank App!");
+        throw new ExitRequested();
     }
 
     private void runCustomerMenu() {
@@ -79,5 +84,9 @@ public class MainMenu {
     public static void main(String[] args) {
         MainMenu bankApp = new MainMenu();
         bankApp.run();
+    }
+
+    public static final class ExitRequested extends RuntimeException {
+        private static final long serialVersionUID = 1L;
     }
 }

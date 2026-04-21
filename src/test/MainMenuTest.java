@@ -1,6 +1,5 @@
 package test;
 
-import main.AppExit;
 import main.MainMenu;
 import org.junit.Test;
 
@@ -41,7 +40,7 @@ public class MainMenuTest {
         try {
             System.setOut(new PrintStream(output));
             menu.processInput(3);
-        } catch (AppExit.Requested e) {
+        } catch (MainMenu.ExitRequested e) {
             // expected
         } finally {
             System.setOut(originalOutput);

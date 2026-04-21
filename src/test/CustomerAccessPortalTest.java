@@ -89,7 +89,7 @@ public class CustomerAccessPortalTest {
         try {
             System.setOut(new PrintStream(output));
             new CustomerAccessPortal(bank, scanner).run();
-        } catch (AppExit.Requested e) {
+        } catch (MainMenu.ExitRequested e) {
             String printed = output.toString();
             assertTrue(printed.contains("\u001B[H\u001B[2J"));
             assertTrue(printed.contains("4. Exit the app"));

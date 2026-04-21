@@ -89,7 +89,7 @@ public class CustomerMenu {
                 System.out.println("Returning to customer access.");
                 return;
             }
-            AppExit.request();
+            MainMenu.requestExit();
         } catch (IllegalStateException | IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }
@@ -306,7 +306,7 @@ public class CustomerMenu {
                 System.out.println("Returning to account dashboard.");
                 return true;
             case ACCOUNT_MENU_EXIT_SELECTION:
-                AppExit.request();
+                MainMenu.requestExit();
                 return true;
             default: return false;
         }

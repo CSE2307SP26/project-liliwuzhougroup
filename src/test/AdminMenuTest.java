@@ -1,10 +1,10 @@
 package test;
 
-import main.AppExit;
 import main.AdminMenu;
 import main.Bank;
 import main.BankAccount;
 import main.Customer;
+import main.MainMenu;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -213,7 +213,7 @@ public class AdminMenuTest {
         try {
             System.setOut(new PrintStream(output));
             menu.processInput(18);
-        } catch (AppExit.Requested e) {
+        } catch (MainMenu.ExitRequested e) {
             assertTrue(output.toString().contains("Thank you for using the 237 Bank App!"));
             return;
         } finally {

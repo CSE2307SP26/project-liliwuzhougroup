@@ -53,7 +53,7 @@ public final class CustomerAccessPortal {
                 return;
             }
             if (selection == EXIT_SELECTION) {
-                AppExit.request();
+                MainMenu.requestExit();
                 return;
             }
             System.out.println("Returning to main menu.");

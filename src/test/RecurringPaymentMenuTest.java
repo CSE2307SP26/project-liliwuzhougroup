@@ -96,7 +96,7 @@ public class RecurringPaymentMenuTest {
             System.setOut(new PrintStream(output));
             menu.processInput(6);
             fail();
-        } catch (AppExit.Requested e) {
+        } catch (MainMenu.ExitRequested e) {
             assertTrue(output.toString().contains("Thank you for using the 237 Bank App!"));
         } finally {
             System.setOut(originalOutput);

@@ -75,7 +75,7 @@ public class AdminMenu extends CustomerMenu {
                 return;
             }
             if (selection == ADMIN_EXIT_SELECTION) {
-                AppExit.request();
+                MainMenu.requestExit();
                 return;
             }
             if (processCustomerSelection(selection)) {
