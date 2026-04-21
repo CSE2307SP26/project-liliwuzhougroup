@@ -6,8 +6,8 @@ import java.util.Scanner;
 public class CustomerMenu {
 
     private static final int DASHBOARD_OPTION_COUNT = 5;
-    private static final int ACCOUNT_MENU_EXIT_SELECTION = 9;
-    private static final int ACCOUNT_MENU_MAX_SELECTION = 9;
+    private static final int ACCOUNT_MENU_EXIT_SELECTION = 10;
+    private static final int ACCOUNT_MENU_MAX_SELECTION = 10;
 
     protected final Scanner keyboardInput;
     protected final Bank bank;
@@ -221,6 +221,10 @@ public class CustomerMenu {
         }
     }
 
+    public void viewMonthlyStatement(BankAccount account) {
+        new MonthlyStatementViewer(keyboardInput, account).viewMonthlyStatement();
+    }
+
     public void manageRecurringPayments() {
         new RecurringPaymentMenu(keyboardInput, customer).run();
     }
@@ -271,8 +275,9 @@ public class CustomerMenu {
         System.out.println("5. Transfer money from this account");
         System.out.println("6. Set maximum withdrawal amount");
         System.out.println("7. Pay a pending fee");
-        System.out.println("8. Close this account");
-        System.out.println("9. Back to account dashboard");
+        System.out.println("8. View monthly statement");
+        System.out.println("9. Close this account");
+        System.out.println("10. Back to account dashboard");
     }
 
     private boolean processAccountSelection(BankAccount account, int selection) {
@@ -284,7 +289,8 @@ public class CustomerMenu {
             case 5: transferBetweenAccounts(account); return false;
             case 6: setMaximumWithdrawalAmount(account); return false;
             case 7: payPendingFee(account); return false;
-            case 8:
+            case 8: viewMonthlyStatement(account); return false;
+            case 9:
                 closeExistingAccount(account);
                 return !customer.getAccounts().contains(account);
             case ACCOUNT_MENU_EXIT_SELECTION:
