@@ -3,7 +3,7 @@ package main;
 import java.io.Serializable;
 import java.time.LocalDate;
 
-final class RecurringPaymentSnapshot implements Serializable {
+public final class RecurringPaymentSnapshot implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final String description;
@@ -13,7 +13,7 @@ final class RecurringPaymentSnapshot implements Serializable {
     private final RecurringPayment.Frequency frequency;
     private final LocalDate nextPaymentDate;
 
-    RecurringPaymentSnapshot(RecurringPayment payment) {
+    public RecurringPaymentSnapshot(RecurringPayment payment) {
         this.description = payment.getDescription();
         this.sourceAccountIndex = payment.getSourceAccountIndex();
         this.targetAccountIndex = payment.getTargetAccountIndex();
@@ -22,7 +22,7 @@ final class RecurringPaymentSnapshot implements Serializable {
         this.nextPaymentDate = payment.getNextPaymentDate();
     }
 
-    RecurringPayment toRecurringPayment() {
+    public RecurringPayment toRecurringPayment() {
         return new RecurringPayment(
                 description,
                 sourceAccountIndex,

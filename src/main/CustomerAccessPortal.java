@@ -2,7 +2,7 @@ package main;
 
 import java.util.Scanner;
 
-final class CustomerAccessPortal {
+public final class CustomerAccessPortal {
     private static final int LOGIN_SELECTION = 1;
     private static final int REGISTER_SELECTION = 2;
     private static final int BACK_SELECTION = 3;
@@ -15,7 +15,7 @@ final class CustomerAccessPortal {
     private final CustomerAuthenticator authenticator;
     private final CustomerRegistrationService registrationService;
 
-    CustomerAccessPortal(Bank bank, Scanner keyboardInput) {
+    public CustomerAccessPortal(Bank bank, Scanner keyboardInput) {
         this.bank = bank;
         this.keyboardInput = keyboardInput;
         this.io = new MenuInput(keyboardInput);
@@ -23,7 +23,7 @@ final class CustomerAccessPortal {
         this.registrationService = new CustomerRegistrationService(bank);
     }
 
-    void run() {
+    public void run() {
         int selection = -1;
         while (selection != BACK_SELECTION) {
             displayOptions();

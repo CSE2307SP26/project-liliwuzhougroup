@@ -67,6 +67,11 @@ public class BankDataStoreTest {
         assertEquals("Monthly fee", loadedFirstAccount.getRemainingFees().get(0).getDescription());
         assertEquals(dueDate, loadedFirstAccount.getRemainingFees().get(0).getDueDate());
         assertTrue(loadedFirstAccount.getTransactionHistory().contains("Deposited: 300.0"));
+        assertEquals(
+                1,
+                loadedFirstAccount.getTransactionsByYearMonth(LocalDate.now().getYear(), LocalDate.now().getMonthValue())
+                        .size()
+        );
 
         BankAccount loadedSecondAccount = loadedCustomer.getAccounts().get(1);
         assertTrue(loadedSecondAccount.isFrozen());

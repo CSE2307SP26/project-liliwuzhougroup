@@ -2,14 +2,14 @@ package main;
 
 import java.util.Scanner;
 
-final class MenuInput {
+public final class MenuInput {
     private final Scanner keyboardInput;
 
-    MenuInput(Scanner keyboardInput) {
+    public MenuInput(Scanner keyboardInput) {
         this.keyboardInput = keyboardInput;
     }
 
-    int readSelection(int max) {
+    public int readSelection(int max) {
         if (max < 1) {
             throw new IllegalArgumentException("At least one selection must be available.");
         }
@@ -25,7 +25,7 @@ final class MenuInput {
         return selection;
     }
 
-    double readPositiveAmount(String prompt) {
+    public double readPositiveAmount(String prompt) {
         double amount = -1;
         while (amount <= 0) {
             System.out.print(prompt);
@@ -38,11 +38,11 @@ final class MenuInput {
         return amount;
     }
 
-    void prepareForTextInput() {
+    public void prepareForTextInput() {
         keyboardInput.skip("\\R?");
     }
 
-    String readRequiredText(String prompt) {
+    public String readRequiredText(String prompt) {
         String value = "";
         while (value.trim().isEmpty()) {
             System.out.print(prompt);
@@ -51,7 +51,7 @@ final class MenuInput {
         return value.trim();
     }
 
-    String readPin(String prompt) {
+    public String readPin(String prompt) {
         String pin = "";
         while (!pin.matches("\\d{4}")) {
             System.out.print(prompt);

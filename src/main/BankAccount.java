@@ -1,6 +1,7 @@
 package main;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +14,7 @@ public class BankAccount implements Serializable {
     private ArrayList<Fee> fees;
     private boolean frozen;
     private double maxWithdrawAmount;
+    private List<Transaction> transactions;
 
     public BankAccount() {
         this.balance = 0;
@@ -20,6 +22,7 @@ public class BankAccount implements Serializable {
         this.fees = new ArrayList<>();
         this.frozen = false;
         this.maxWithdrawAmount = Double.MAX_VALUE;
+        this.transactions = new ArrayList<>();
     }
 
     public BankAccount(double balance, String transactionHistory) {
@@ -28,6 +31,7 @@ public class BankAccount implements Serializable {
         this.fees = new ArrayList<>();
         this.frozen = false;
         this.maxWithdrawAmount = Double.MAX_VALUE;
+        this.transactions = new ArrayList<>();
     }
 
     public BankAccount(double balance, String transactionHistory, boolean frozen) {
@@ -36,6 +40,7 @@ public class BankAccount implements Serializable {
         this.fees = new ArrayList<>();
         this.frozen = frozen;
         this.maxWithdrawAmount = Double.MAX_VALUE;
+        this.transactions = new ArrayList<>();
     }
 
     public BankAccount(double balance, String transactionHistory, boolean frozen, double maxWithdrawAmount) {
@@ -44,6 +49,7 @@ public class BankAccount implements Serializable {
         this.fees = new ArrayList<>();
         this.frozen = frozen;
         this.maxWithdrawAmount = maxWithdrawAmount <= 0 ? Double.MAX_VALUE : maxWithdrawAmount;
+        this.transactions = new ArrayList<>();
     }
 
     public BankAccount(double balance, String transactionHistory, double maxWithdrawAmount) {
@@ -56,13 +62,14 @@ public class BankAccount implements Serializable {
         } else {
             this.maxWithdrawAmount = maxWithdrawAmount;
         }
+        this.transactions = new ArrayList<>();
     }
 
     public void deposit(double amount) {
         ensureAccountIsActive();
         if (amount > 0) {
             this.balance += amount;
-            this.transactionHistory += "Deposited: " + amount + "\n";
+            recordTransaction("Deposited: " + amount, amount);
         } else {
             throw new IllegalArgumentException("Deposit amount must be greater than 0.");
         }
@@ -71,7 +78,7 @@ public class BankAccount implements Serializable {
     public void addInterest(double interestAmount) {
         if (interestAmount > 0) {
             this.balance += interestAmount;
-            this.transactionHistory += "Interest added: " + interestAmount + "\n";
+            recordTransaction("Interest added: " + interestAmount, interestAmount);
         } else {
             throw new IllegalArgumentException("Interest amount must be greater than 0.");
         }
@@ -80,7 +87,7 @@ public class BankAccount implements Serializable {
     public void collectFee(double feeAmount) {
         if (feeAmount > 0) {
             this.balance -= feeAmount;
-            this.transactionHistory += "Fee collected: " + feeAmount + "\n";
+            recordTransaction("Fee collected: " + feeAmount, -feeAmount);
         } else {
             throw new IllegalArgumentException("Fee amount must be greater than 0.");
         }
@@ -103,7 +110,7 @@ public class BankAccount implements Serializable {
             throw new IllegalStateException("This account is already frozen.");
         }
         this.frozen = true;
-        this.transactionHistory += "Account frozen.\n";
+        recordTransaction("Account frozen.", 0.0);
     }
 
     public void unfreezeAccount() {
@@ -111,7 +118,7 @@ public class BankAccount implements Serializable {
             throw new IllegalStateException("This account is not frozen.");
         }
         this.frozen = false;
-        this.transactionHistory += "Account unfrozen.\n";
+        recordTransaction("Account unfrozen.", 0.0);
     }
 
     public double getMaxWithdrawAmount() {
@@ -124,8 +131,9 @@ public class BankAccount implements Serializable {
         }
 
         this.maxWithdrawAmount = maxWithdrawAmount;
-        this.transactionHistory += "Maximum withdrawal amount set to: " + maxWithdrawAmount + "\n";
+        recordTransaction("Maximum withdrawal amount set to: " + maxWithdrawAmount, 0.0);
     }
+
     public void withdraw(double amount) {
         ensureAccountIsActive();
 
@@ -140,7 +148,7 @@ public class BankAccount implements Serializable {
             throw new IllegalArgumentException("Insufficient funds.");
         }
         balance -= amount;
-        this.transactionHistory += "Withdrew: " + amount + "\n";
+        recordTransaction("Withdrew: " + amount, -amount);
     }
 
     public void transferMoney(BankAccount targetAccount, double amount) {
@@ -189,12 +197,39 @@ public class BankAccount implements Serializable {
 
         balance -= fee.getAmount();
         fees.remove(feeIndex);
-        this.transactionHistory += "Paid fee: " + fee.getAmount() + " for " + fee.getDescription() + "\n";
+        recordTransaction("Paid fee: " + fee.getAmount() + " for " + fee.getDescription(), -fee.getAmount());
     }
 
     public List<Fee> getRemainingFees() {
         return new ArrayList<>(this.fees);
     }
+
+    public List<Transaction> getTransactions() {
+        return new ArrayList<>(this.transactions);
+    }
+
+    public List<Transaction> getTransactionsByYearMonth(int year, int month) {
+        List<Transaction> result = new ArrayList<>();
+        for (Transaction t : this.transactions) {
+            if (t.getDate().getYear() == year && t.getDate().getMonthValue() == month) {
+                result.add(t);
+            }
+        }
+        return result;
+    }
+
+    void addTransactionRecord(Transaction t) {
+        if (t == null) {
+            throw new IllegalArgumentException("Transaction cannot be null.");
+        }
+        this.transactions.add(t);
+    }
+
+    private void recordTransaction(String description, double amount) {
+        this.transactionHistory += description + "\n";
+        this.transactions.add(new Transaction(LocalDate.now(), description, amount));
+    }
+
     private void ensureAccountIsActive() {
         if (this.frozen) {
             throw new IllegalStateException("This account is frozen. Transactions are not allowed.");

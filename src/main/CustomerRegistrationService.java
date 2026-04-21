@@ -1,13 +1,13 @@
 package main;
 
-final class CustomerRegistrationService {
+public final class CustomerRegistrationService {
     private final Bank bank;
 
-    CustomerRegistrationService(Bank bank) {
+    public CustomerRegistrationService(Bank bank) {
         this.bank = bank;
     }
 
-    Customer register(CustomerRegistrationRequest request) {
+    public Customer register(CustomerRegistrationRequest request) {
         if (request == null) {
             throw new IllegalArgumentException("Registration request cannot be null.");
         }

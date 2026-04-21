@@ -45,8 +45,7 @@ public class CustomerDashboardMenuTest {
         String input = String.join(System.lineSeparator(),
                 "1",
                 "50",
-                "9",
-                "9"
+                "10"
         ) + System.lineSeparator();
         CustomerMenu menu = new CustomerMenu(
                 new Bank(),
@@ -78,8 +77,7 @@ public class CustomerDashboardMenuTest {
         String input = String.join(System.lineSeparator(),
                 "7",
                 "1",
-                "9",
-                "9"
+                "10"
         ) + System.lineSeparator();
         CustomerMenu menu = new CustomerMenu(
                 new Bank(),

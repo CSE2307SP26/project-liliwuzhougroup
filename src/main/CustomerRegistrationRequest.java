@@ -1,6 +1,6 @@
 package main;
 
-final class CustomerRegistrationRequest {
+public final class CustomerRegistrationRequest {
     private final String name;
     private final String address;
     private final String phoneNumber;
@@ -8,7 +8,7 @@ final class CustomerRegistrationRequest {
     private final String password;
     private final String pin;
 
-    CustomerRegistrationRequest(String name, String address, String phoneNumber,
+    public CustomerRegistrationRequest(String name, String address, String phoneNumber,
                                 String email, String password, String pin) {
         this.name = name;
         this.address = address;
@@ -18,27 +18,27 @@ final class CustomerRegistrationRequest {
         this.pin = pin;
     }
 
-    String getName() {
+    public String getName() {
         return name;
     }
 
-    String getAddress() {
+    public String getAddress() {
         return address;
     }
 
-    String getPhoneNumber() {
+    public String getPhoneNumber() {
         return phoneNumber;
     }
 
-    String getEmail() {
+    public String getEmail() {
         return email;
     }
 
-    String getPassword() {
+    public String getPassword() {
         return password;
     }
 
-    String getPin() {
+    public String getPin() {
         return pin;
     }
 }
