@@ -1,11 +1,8 @@
 package main;
 
-import java.util.List;
 import java.util.Scanner;
 
 public class MainMenu {
-
-    private static final int EXIT_SELECTION = 3;
     private static final int MAX_SELECTION = 3;
 
     private final Scanner keyboardInput;
@@ -19,6 +16,7 @@ public class MainMenu {
     }
 
     public void displayOptions() {
+        MenuScreen.redraw();
         System.out.println("Welcome to the 237 Bank App!");
         System.out.println("1. Log in as customer");
         System.out.println("2. Log in as admin");
@@ -35,20 +33,23 @@ public class MainMenu {
                 runAdminMenu();
                 return;
             }
-            System.out.println("Thank you for using the 237 Bank App!");
+            AppExit.request();
         } catch (IllegalStateException e) {
             System.out.println(e.getMessage());
         }
     }
 
     public void run() {
-        int selection = -1;
-        while (selection != EXIT_SELECTION) {
-            displayOptions();
-            selection = io.readSelection(MAX_SELECTION);
-            processInput(selection);
+        try {
+            while (true) {
+                displayOptions();
+                processInput(io.readSelection(MAX_SELECTION));
+            }
+        } catch (AppExit.Requested e) {
+            // Exit requested from any menu level.
+        } finally {
+            saveData();
         }
-        saveData();
     }
 
     private void runCustomerMenu() {
@@ -64,30 +65,6 @@ public class MainMenu {
         }
         Customer adminContext = bank.getCustomers().isEmpty() ? null : bank.getCustomers().get(0);
         new AdminMenu(bank, keyboardInput, adminContext).run();
-    }
-
-    public void viewAdminTransactionHistory() {
-        List<Customer> customers = bank.getCustomers();
-        if (customers.isEmpty()) {
-            System.out.println("No customers found.");
-            return;
-        }
-        System.out.println("Select a customer:");
-        for (int i = 0; i < customers.size(); i++) {
-            System.out.println((i + 1) + ". " + customers.get(i).getName());
-        }
-        Customer selected = customers.get(io.readSelection(customers.size()) - 1);
-
-        List<BankAccount> accounts = selected.getAccounts();
-        System.out.println("Select an account:");
-        for (int i = 0; i < accounts.size(); i++) {
-            System.out.println((i + 1) + ". Account #" + (i + 1) + " (Balance: " + accounts.get(i).getBalance() + ")");
-        }
-        BankAccount account = accounts.get(io.readSelection(accounts.size()) - 1);
-
-        String history = account.getTransactionHistory();
-        System.out.println("Transaction History:");
-        System.out.println(history.isEmpty() ? "No transactions yet." : history);
     }
 
     private void saveData() {
