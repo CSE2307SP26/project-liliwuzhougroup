@@ -15,6 +15,21 @@ public final class SampleBankFactory {
 
     public static Bank createSampleBank() {
         Bank bank = new Bank();
+        ensureSampleCustomer(bank);
+        return bank;
+    }
+
+    public static Bank ensureSampleCustomer(Bank bank) {
+        if (bank == null) {
+            throw new IllegalArgumentException("Bank cannot be null.");
+        }
+        if (bank.findCustomerByEmail(SAMPLE_CUSTOMER_EMAIL) == null) {
+            bank.addCustomer(createSampleCustomer());
+        }
+        return bank;
+    }
+
+    private static Customer createSampleCustomer() {
         Customer customer = new Customer(SAMPLE_CUSTOMER_NAME);
         customer.updatePersonalInformation(
                 SAMPLE_CUSTOMER_ADDRESS,
@@ -25,7 +40,6 @@ public final class SampleBankFactory {
         customer.setPin(SAMPLE_CUSTOMER_PIN);
         customer.getAccounts().get(0).deposit(PRIMARY_ACCOUNT_BALANCE);
         customer.openAccount().deposit(SECONDARY_ACCOUNT_BALANCE);
-        bank.addCustomer(customer);
-        return bank;
+        return customer;
     }
 }

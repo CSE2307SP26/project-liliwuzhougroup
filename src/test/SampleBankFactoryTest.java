@@ -29,4 +29,13 @@ public class SampleBankFactoryTest {
         assertEquals(SampleBankFactory.SECONDARY_ACCOUNT_BALANCE,
                 customer.getAccounts().get(1).getBalance(), 0.001);
     }
+
+    @Test
+    public void testEnsureSampleCustomerDoesNotDuplicateExistingSample() {
+        Bank bank = SampleBankFactory.createSampleBank();
+
+        SampleBankFactory.ensureSampleCustomer(bank);
+
+        assertEquals(1, bank.getCustomers().size());
+    }
 }
