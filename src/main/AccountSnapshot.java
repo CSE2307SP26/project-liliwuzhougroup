@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-final class AccountSnapshot implements Serializable {
+public final class AccountSnapshot implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final double balance;
@@ -14,7 +14,7 @@ final class AccountSnapshot implements Serializable {
     private final List<FeeSnapshot> fees;
     private final List<Transaction> transactions;
 
-    AccountSnapshot(BankAccount account) {
+    public AccountSnapshot(BankAccount account) {
         this.balance = account.getBalance();
         this.transactionHistory = account.getTransactionHistory();
         this.frozen = account.isFrozen();
@@ -23,7 +23,7 @@ final class AccountSnapshot implements Serializable {
         this.transactions = new ArrayList<>(account.getTransactions());
     }
 
-    BankAccount toAccount() {
+    public BankAccount toAccount() {
         BankAccount account = new BankAccount(
                 balance,
                 transactionHistory,

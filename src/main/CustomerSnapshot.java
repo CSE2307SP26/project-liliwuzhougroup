@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-final class CustomerSnapshot implements Serializable {
+public final class CustomerSnapshot implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final String name;
@@ -16,7 +16,7 @@ final class CustomerSnapshot implements Serializable {
     private final List<AccountSnapshot> accounts;
     private final List<RecurringPaymentSnapshot> recurringPayments;
 
-    CustomerSnapshot(Customer customer) {
+    public CustomerSnapshot(Customer customer) {
         CustomerCredentials credentials = customer.getCredentials();
         this.name = customer.getName();
         this.address = customer.getAddress();
@@ -28,7 +28,7 @@ final class CustomerSnapshot implements Serializable {
         this.recurringPayments = toPaymentSnapshots(customer.getRecurringPayments());
     }
 
-    Customer toCustomer() {
+    public Customer toCustomer() {
         return new Customer(
                 new CustomerProfile(name, address, phoneNumber, email),
                 new CustomerCredentials(password, pin),
