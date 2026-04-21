@@ -1,6 +1,7 @@
 package main;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +9,8 @@ import java.util.List;
 public class BankAccount implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    private static final double NO_MAX_WITHDRAW_AMOUNT = 0.0;
+    private static final double LEGACY_UNLIMITED_MAX_WITHDRAW_AMOUNT = Double.MAX_VALUE;
 
     private double balance;
     private String transactionHistory;
@@ -21,7 +24,7 @@ public class BankAccount implements Serializable {
         this.transactionHistory = "";
         this.fees = new ArrayList<>();
         this.frozen = false;
-        this.maxWithdrawAmount = Double.MAX_VALUE;
+        this.maxWithdrawAmount = NO_MAX_WITHDRAW_AMOUNT;
         this.transactions = new ArrayList<>();
     }
 
@@ -30,7 +33,7 @@ public class BankAccount implements Serializable {
         this.transactionHistory = transactionHistory == null ? "" : transactionHistory;
         this.fees = new ArrayList<>();
         this.frozen = false;
-        this.maxWithdrawAmount = Double.MAX_VALUE;
+        this.maxWithdrawAmount = NO_MAX_WITHDRAW_AMOUNT;
         this.transactions = new ArrayList<>();
     }
 
@@ -39,7 +42,7 @@ public class BankAccount implements Serializable {
         this.transactionHistory = transactionHistory == null ? "" : transactionHistory;
         this.fees = new ArrayList<>();
         this.frozen = frozen;
-        this.maxWithdrawAmount = Double.MAX_VALUE;
+        this.maxWithdrawAmount = NO_MAX_WITHDRAW_AMOUNT;
         this.transactions = new ArrayList<>();
     }
 
@@ -48,7 +51,7 @@ public class BankAccount implements Serializable {
         this.transactionHistory = transactionHistory == null ? "" : transactionHistory;
         this.fees = new ArrayList<>();
         this.frozen = frozen;
-        this.maxWithdrawAmount = maxWithdrawAmount <= 0 ? Double.MAX_VALUE : maxWithdrawAmount;
+        this.maxWithdrawAmount = normalizeMaxWithdrawAmount(maxWithdrawAmount);
         this.transactions = new ArrayList<>();
     }
 
@@ -57,11 +60,7 @@ public class BankAccount implements Serializable {
         this.transactionHistory = transactionHistory == null ? "" : transactionHistory;
         this.fees = new ArrayList<>();
         this.frozen = false;
-        if (maxWithdrawAmount <= 0) {
-            this.maxWithdrawAmount = Double.MAX_VALUE;
-        } else {
-            this.maxWithdrawAmount = maxWithdrawAmount;
-        }
+        this.maxWithdrawAmount = normalizeMaxWithdrawAmount(maxWithdrawAmount);
         this.transactions = new ArrayList<>();
     }
 
@@ -125,8 +124,12 @@ public class BankAccount implements Serializable {
         return this.maxWithdrawAmount;
     }
 
+    public String getDisplayMaxWithdrawAmount() {
+        return formatDisplayAmount(maxWithdrawAmount);
+    }
+
     public void setMaxWithdrawAmount(double maxWithdrawAmount) {
-        if (maxWithdrawAmount <= 0) {
+        if (!Double.isFinite(maxWithdrawAmount) || maxWithdrawAmount <= 0) {
             throw new IllegalArgumentException("Maximum withdrawal amount must be greater than 0.");
         }
 
@@ -141,7 +144,7 @@ public class BankAccount implements Serializable {
             throw new IllegalArgumentException("Withdrawal amount must be greater than 0.");
         }
 
-        if (amount > maxWithdrawAmount) {
+        if (hasMaxWithdrawLimit() && amount > maxWithdrawAmount) {
             throw new IllegalArgumentException("Withdrawal amount exceeds the maximum amount");
         }
         if (amount > balance) {
@@ -234,5 +237,22 @@ public class BankAccount implements Serializable {
         if (this.frozen) {
             throw new IllegalStateException("This account is frozen. Transactions are not allowed.");
         }
+    }
+
+    private boolean hasMaxWithdrawLimit() {
+        return maxWithdrawAmount > NO_MAX_WITHDRAW_AMOUNT;
+    }
+
+    private double normalizeMaxWithdrawAmount(double maxWithdrawAmount) {
+        if (!Double.isFinite(maxWithdrawAmount)
+                || maxWithdrawAmount <= NO_MAX_WITHDRAW_AMOUNT
+                || maxWithdrawAmount == LEGACY_UNLIMITED_MAX_WITHDRAW_AMOUNT) {
+            return NO_MAX_WITHDRAW_AMOUNT;
+        }
+        return maxWithdrawAmount;
+    }
+
+    private String formatDisplayAmount(double amount) {
+        return BigDecimal.valueOf(amount).stripTrailingZeros().toPlainString();
     }
 }
