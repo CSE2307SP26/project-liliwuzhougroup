@@ -2,6 +2,7 @@ package test;
 
 import main.BankAccount;
 import main.Customer;
+import main.Fee;
 import main.RecurringPayment;
 import main.RecurringPayment.Frequency;
 import org.junit.Test;
@@ -224,6 +225,39 @@ public class CustomerTest {
             fail();
         } catch (IllegalStateException e) {
             assertEquals("Cannot close account with non-zero balance.", e.getMessage());
+        }
+
+        assertTrue(customer.getAccounts().contains(account));
+    }
+
+    @Test
+    public void testCloseAccountWithUnpaidFees() {
+        Customer customer = new Customer("John");
+        BankAccount account = new BankAccount();
+        account.createFee(new Fee(25.0, "Late fee", new java.util.Date(System.currentTimeMillis() + 86400000)));
+        customer.openAccount(account);
+
+        try {
+            customer.closeAccount(account);
+            fail();
+        } catch (IllegalStateException e) {
+            assertEquals("Cannot close account with unpaid fees.", e.getMessage());
+        }
+
+        assertTrue(customer.getAccounts().contains(account));
+    }
+
+    @Test
+    public void testCloseAccountWithActiveRecurringPayments() {
+        Customer customer = customerWithRecurringAccounts();
+        BankAccount account = customer.getAccounts().get(1);
+        customer.setupRecurringPayment("Rent", 0, 1, 200.0, Frequency.MONTHLY);
+
+        try {
+            customer.closeAccount(account);
+            fail();
+        } catch (IllegalStateException e) {
+            assertEquals("Cannot close account while recurring payments are active.", e.getMessage());
         }
 
         assertTrue(customer.getAccounts().contains(account));

@@ -114,6 +114,13 @@ public class Customer implements Serializable {
         if (account.getBalance() != 0) {
             throw new IllegalStateException("Cannot close account with non-zero balance.");
         }
+        if (!account.getRemainingFees().isEmpty()) {
+            throw new IllegalStateException("Cannot close account with unpaid fees.");
+        }
+        // Recurring payments store account indices, so closing any account would invalidate them.
+        if (!recurringPayments.isEmpty()) {
+            throw new IllegalStateException("Cannot close account while recurring payments are active.");
+        }
         this.accounts.remove(account);
     }
 
