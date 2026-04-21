@@ -25,3 +25,5 @@ replay_pid*
 src/.DS_Store
 *.json
 out/
+bank-data.dat
+.DS_Store

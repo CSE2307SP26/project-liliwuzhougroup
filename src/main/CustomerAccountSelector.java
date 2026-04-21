@@ -28,7 +28,7 @@ public final class CustomerAccountSelector {
             System.out.println((i + 1) + ". Account #" + (i + 1)
                     + " (Balance: " + account.getBalance()
                     + ", Status: " + status
-                    + ", Max Withdraw: " + account.getMaxWithdrawAmount() + ")");
+                    + ", Max Withdraw: " + account.getDisplayMaxWithdrawAmount() + ")");
         }
     }
 

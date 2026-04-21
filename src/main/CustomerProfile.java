@@ -17,7 +17,7 @@ public final class CustomerProfile implements Serializable {
     public CustomerProfile(String name, String address, String phoneNumber, String email) {
         this(name);
         this.address = address;
-        this.phoneNumber = phoneNumber;
+        this.phoneNumber = PhoneNumberFormatter.normalizeOptional(phoneNumber);
         this.email = email;
     }
 
@@ -39,7 +39,7 @@ public final class CustomerProfile implements Serializable {
 
     public void updatePersonalInformation(String address, String phoneNumber, String email) {
         this.address = requireValue(address, "Address");
-        this.phoneNumber = requireValue(phoneNumber, "Phone number");
+        this.phoneNumber = PhoneNumberFormatter.normalizeRequired(phoneNumber);
         this.email = requireValue(email, "Email");
     }
 

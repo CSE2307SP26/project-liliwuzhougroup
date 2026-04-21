@@ -6,8 +6,9 @@ public final class CustomerAccessPortal {
     private static final int LOGIN_SELECTION = 1;
     private static final int REGISTER_SELECTION = 2;
     private static final int BACK_SELECTION = 3;
+    private static final int EXIT_SELECTION = 4;
     private static final int PASSWORD_SELECTION = 1;
-    private static final int MAX_SELECTION = 3;
+    private static final int MAX_SELECTION = 4;
 
     private final Bank bank;
     private final Scanner keyboardInput;
@@ -33,10 +34,12 @@ public final class CustomerAccessPortal {
     }
 
     private void displayOptions() {
+        MenuScreen.redraw();
         System.out.println("Customer Access:");
         System.out.println("1. Log in");
         System.out.println("2. Create a new account");
         System.out.println("3. Back to main menu");
+        System.out.println("4. Exit the app");
     }
 
     private void processSelection(int selection) {
@@ -47,6 +50,10 @@ public final class CustomerAccessPortal {
             }
             if (selection == REGISTER_SELECTION) {
                 registerCustomer(null);
+                return;
+            }
+            if (selection == EXIT_SELECTION) {
+                MainMenu.requestExit();
                 return;
             }
             System.out.println("Returning to main menu.");
@@ -106,7 +113,7 @@ public final class CustomerAccessPortal {
         io.prepareForTextInput();
         String name = io.readRequiredText("Enter your full name: ");
         String address = io.readRequiredText("Enter your address: ");
-        String phoneNumber = io.readRequiredText("Enter your phone number: ");
+        String phoneNumber = io.readPhoneNumber("Enter your phone number: ");
         String selectedEmail = email == null ? io.readRequiredText("Enter your email: ") : email.trim();
         String password = io.readRequiredText("Create a password: ");
         return new CustomerRegistrationRequest(
