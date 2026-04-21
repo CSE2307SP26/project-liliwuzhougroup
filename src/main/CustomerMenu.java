@@ -5,9 +5,10 @@ import java.util.Scanner;
 
 public class CustomerMenu {
 
-    private static final int DASHBOARD_OPTION_COUNT = 5;
-    private static final int ACCOUNT_MENU_EXIT_SELECTION = 10;
-    private static final int ACCOUNT_MENU_MAX_SELECTION = 10;
+    private static final int DASHBOARD_OPTION_COUNT = 6;
+    private static final int ACCOUNT_MENU_BACK_SELECTION = 10;
+    private static final int ACCOUNT_MENU_EXIT_SELECTION = 11;
+    private static final int ACCOUNT_MENU_MAX_SELECTION = 11;
 
     protected final Scanner keyboardInput;
     protected final Bank bank;
@@ -37,7 +38,7 @@ public class CustomerMenu {
 
     public void run() {
         int selection = -1;
-        while (selection != getDashboardExitSelection()) {
+        while (selection != getDashboardBackSelection()) {
             displayOptions();
             selection = io.readSelection(getDashboardMaxSelection());
             processInput(selection);
@@ -45,6 +46,7 @@ public class CustomerMenu {
     }
 
     public void displayOptions() {
+        MenuScreen.redraw();
         System.out.println("Account Dashboard:");
         if (customer.getAccounts().isEmpty()) {
             System.out.println("No accounts available.");
@@ -56,7 +58,8 @@ public class CustomerMenu {
         System.out.println(option++ + ". Manage recurring payments");
         System.out.println(option++ + ". Update personal information");
         System.out.println(option++ + ". Set password or PIN");
-        System.out.println(option + ". Back to main menu");
+        System.out.println(option++ + ". Back to customer access");
+        System.out.println(option + ". Exit the app");
     }
 
     public void processInput(int selection) {
@@ -82,7 +85,11 @@ public class CustomerMenu {
                 setPasswordOrPin();
                 return;
             }
-            System.out.println("Leaving customer dashboard.");
+            if (selection == accountCount + 5) {
+                System.out.println("Returning to customer access.");
+                return;
+            }
+            AppExit.request();
         } catch (IllegalStateException | IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }
@@ -124,7 +131,7 @@ public class CustomerMenu {
         String status = account.isFrozen() ? "Frozen" : "Active";
         System.out.println("Your current balance is: " + account.getBalance());
         System.out.println("Account status: " + status);
-        System.out.println("Maximum withdrawal amount is: " + account.getMaxWithdrawAmount());
+        System.out.println("Maximum withdrawal amount is: " + account.getDisplayMaxWithdrawAmount());
     }
 
     public void displayTransactionHistory() {
@@ -232,7 +239,7 @@ public class CustomerMenu {
     public void updatePersonalInformation() {
         io.prepareForTextInput();
         String address = io.readRequiredText("Enter your address: ");
-        String phoneNumber = io.readRequiredText("Enter your phone number: ");
+        String phoneNumber = io.readPhoneNumber("Enter your phone number: ");
         String email = io.readRequiredText("Enter your email: ");
         customer.updatePersonalInformation(address, phoneNumber, email);
         System.out.println("Personal information updated successfully.");
@@ -264,6 +271,7 @@ public class CustomerMenu {
     }
 
     private void displayAccountOptions(BankAccount account) {
+        MenuScreen.redraw();
         int accountNumber = customer.getAccounts().indexOf(account) + 1;
         System.out.println("Account #" + accountNumber + " Menu:");
         displayBalance(account);
@@ -278,6 +286,7 @@ public class CustomerMenu {
         System.out.println("8. View monthly statement");
         System.out.println("9. Close this account");
         System.out.println("10. Back to account dashboard");
+        System.out.println("11. Exit the app");
     }
 
     private boolean processAccountSelection(BankAccount account, int selection) {
@@ -293,8 +302,11 @@ public class CustomerMenu {
             case 9:
                 closeExistingAccount(account);
                 return !customer.getAccounts().contains(account);
-            case ACCOUNT_MENU_EXIT_SELECTION:
+            case ACCOUNT_MENU_BACK_SELECTION:
                 System.out.println("Returning to account dashboard.");
+                return true;
+            case ACCOUNT_MENU_EXIT_SELECTION:
+                AppExit.request();
                 return true;
             default: return false;
         }
@@ -304,7 +316,7 @@ public class CustomerMenu {
         return customer.getAccounts().size() + DASHBOARD_OPTION_COUNT;
     }
 
-    private int getDashboardExitSelection() {
-        return getDashboardMaxSelection();
+    private int getDashboardBackSelection() {
+        return customer.getAccounts().size() + DASHBOARD_OPTION_COUNT - 1;
     }
 }
