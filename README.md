@@ -1,61 +1,72 @@
 # project26
 
-## Team Members:
+## Team Members
 
 * John Li
 * Jack Zhou
 * Nick Wu
 * Kevin Li
 
-## User stories
+## Project Overview
 
-1. A bank customer should be able to deposit into an existing account. (Shook)
-2. A bank customer should be able to withdraw from an account. 
-3. A bank customer should be able to check their account balance. 
-4. A bank customer should be able to view their transaction history for an account. 
-5. A bank customer should be able to create an additional account with the bank. 
-6. A bank customer should be able to close an existing account.
-7. A bank customer should be able to transfer money from one account to another. 
-8. A bank adminstrator should be able to collect fees from existing accounts when necessary.
-9. A bank adminstrator should be able to add an interest payment to an existing account when necessary.、
-10. A bank administrator should be able to login as a administrator to perform actions that only a bank admin can perform.
-11. A bank customer should be able to receive notifications when they have fee before due.
-12. A bank administrator should be able to see all transactions for a particular account.
-13. A bank customer should be able to set a auto recurring payment to an account.
-14. A bank administrator should be able to freeze or unfreeze a customer account.
-15. A bank costumer should be able to set a maximum withdraw amount for their account
-16. A bank customer should be able to set a password or PIN for account security.
-17. A bank customer should be able to update their personal information.
+This project is a console-based banking application written in Java. It supports customer account management, recurring payments, fee handling, monthly statements, customer authentication, and administrator-only operations such as interest, fee collection, and account freezing.
 
-## What user stories were completed in this iteration?
-* In this iteration, we completed several user stories related to both customer and administrator functions. A bank administrator can now log in as an administrator, view all transactions for a particular account, and freeze or unfreeze a customer account. On the customer side, users can now receive notifications before a fee is due, set up an auto recurring payment to an account, set a maximum withdrawal amount, create a password or PIN for account security, and update their personal information.
+## Implemented User Stories
 
-## What user stories do you intend to complete next iteration?
-In the next iteration, we plan to improve and expand the current banking features by adding more account management options, improving transaction handling, and strengthening security-related functions. We also want to continue refining the menu structure and overall usability of the program.
+1. A bank customer can deposit into an existing account.
+2. A bank customer can withdraw from an account.
+3. A bank customer can check an account balance.
+4. A bank customer can view transaction history for an account.
+5. A bank customer can create an additional account.
+6. A bank customer can close an existing account.
+7. A bank customer can transfer money between accounts.
+8. A bank administrator can collect fees from existing accounts.
+9. A bank administrator can add interest to an existing account.
+10. A bank administrator can log in to perform admin-only actions.
+11. A bank customer can receive pending-fee notifications while using the account menus.
+12. A bank administrator can view transaction history for a specific customer account.
+13. A bank customer can set up recurring payments between accounts.
+14. A bank administrator can freeze or unfreeze an account.
+15. A bank customer can set a maximum withdrawal amount.
+16. A bank customer can set a password or PIN for account security.
+17. A bank customer can update personal information.
 
-## What user stories were completed in this iteration?
-1. A bank administrator should be able to login as a administrator to perform actions that only a bank admin can perform.
-2. A bank customer should be able to receive notifications when they have fee before due.
-3. A bank administrator should be able to see all transactions for a particular account.
-4. A bank customer should be able to set a auto recurring payment to an account.
-5. A bank administrator should be able to freeze or unfreeze a customer account.
-6. A bank costumer should be able to set a maximum withdraw amount for their account
-7. A bank customer should be able to set a password or PIN for account security.
-8. A bank customer should be able to update their personal information.
+## Run the Application
 
-
-## Is there anything that you implemented but doesn't currently work?
-* At this point, the main features listed above have been implemented. Some parts may still need further testing, integration, or refinement to make sure they work smoothly in all cases, but no major intended feature is completely unfinished.
-
-
-## What commands are needed to compile and run your code from the command line?
 ```bash
 chmod +x runApp.sh
 ./runApp.sh
 ```
 
-## Admin Password
-```text
-admin123
+The application stores data in `bank-data.dat` in the project root. On a fresh run, when that file does not exist yet, the app seeds a demo customer so the main user flows can be exercised immediately. Once the file exists, the app loads the saved data instead.
+
+If you want to reset back to the demo data, delete `bank-data.dat` and run the app again.
+
+## Run the Tests
+
+```bash
+mkdir -p out/test-classes
+javac -cp test-lib/junit-platform-console-standalone-1.13.0-M3.jar -d out/test-classes src/main/*.java src/test/*.java
+java -jar test-lib/junit-platform-console-standalone-1.13.0-M3.jar --class-path out/test-classes --scan-class-path
 ```
 
+## Demo Credentials
+
+### Admin
+
+```text
+Password: admin123
+```
+
+### Sample Customer
+
+Available automatically on a fresh run before `bank-data.dat` is created.
+
+```text
+Name: Sample User
+Email: sample.user@237bank.com
+Password: user123
+PIN: 1234
+```
+
+The seeded customer starts with two accounts so transfer and recurring-payment flows are available immediately.
