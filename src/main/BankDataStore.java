@@ -14,7 +14,11 @@ public final class BankDataStore {
     }
 
     public static Bank loadBank() {
-        return loadBank(new File(DATA_FILE));
+        File file = new File(DATA_FILE);
+        if (!file.exists()) {
+            return SampleBankFactory.createSampleBank();
+        }
+        return loadBank(file);
     }
 
     public static Bank loadBank(File file) {
