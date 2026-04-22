@@ -17,6 +17,7 @@ public class BankAccount implements Serializable {
     private ArrayList<Fee> fees;
     private boolean frozen;
     private double maxWithdrawAmount;
+    private double lowBalanceThreshold;
     private List<Transaction> transactions;
 
     public BankAccount() {
@@ -25,6 +26,7 @@ public class BankAccount implements Serializable {
         this.fees = new ArrayList<>();
         this.frozen = false;
         this.maxWithdrawAmount = NO_MAX_WITHDRAW_AMOUNT;
+        this.lowBalanceThreshold = 0;
         this.transactions = new ArrayList<>();
     }
 
@@ -34,6 +36,7 @@ public class BankAccount implements Serializable {
         this.fees = new ArrayList<>();
         this.frozen = false;
         this.maxWithdrawAmount = NO_MAX_WITHDRAW_AMOUNT;
+        this.lowBalanceThreshold = 0;
         this.transactions = new ArrayList<>();
     }
 
@@ -43,6 +46,7 @@ public class BankAccount implements Serializable {
         this.fees = new ArrayList<>();
         this.frozen = frozen;
         this.maxWithdrawAmount = NO_MAX_WITHDRAW_AMOUNT;
+        this.lowBalanceThreshold = 0;
         this.transactions = new ArrayList<>();
     }
 
@@ -52,6 +56,7 @@ public class BankAccount implements Serializable {
         this.fees = new ArrayList<>();
         this.frozen = frozen;
         this.maxWithdrawAmount = normalizeMaxWithdrawAmount(maxWithdrawAmount);
+        this.lowBalanceThreshold = 0;
         this.transactions = new ArrayList<>();
     }
 
@@ -61,6 +66,7 @@ public class BankAccount implements Serializable {
         this.fees = new ArrayList<>();
         this.frozen = false;
         this.maxWithdrawAmount = normalizeMaxWithdrawAmount(maxWithdrawAmount);
+        this.lowBalanceThreshold = 0;
         this.transactions = new ArrayList<>();
     }
 
@@ -125,6 +131,9 @@ public class BankAccount implements Serializable {
     }
 
     public String getDisplayMaxWithdrawAmount() {
+        if (!hasMaxWithdrawLimit()) {
+            return "Unlimited";
+        }
         return formatDisplayAmount(maxWithdrawAmount);
     }
 
@@ -205,6 +214,21 @@ public class BankAccount implements Serializable {
 
     public List<Fee> getRemainingFees() {
         return new ArrayList<>(this.fees);
+    }
+
+    public double getLowBalanceThreshold() {
+        return this.lowBalanceThreshold;
+    }
+
+    public void setLowBalanceThreshold(double threshold) {
+        if (!Double.isFinite(threshold) || threshold < 0) {
+            throw new IllegalArgumentException("Low balance threshold must be a non-negative finite number.");
+        }
+        this.lowBalanceThreshold = threshold;
+    }
+
+    public boolean wouldTriggerLowBalanceWarning(double amount) {
+        return lowBalanceThreshold > 0 && (balance - amount) < lowBalanceThreshold;
     }
 
     public List<Transaction> getTransactions() {

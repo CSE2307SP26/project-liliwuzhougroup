@@ -52,7 +52,7 @@ public class CustomerMenuTest {
         assertTrue(dashboard.contains("Account Dashboard:"));
         assertTrue(dashboard.contains("1. Account #1"));
         assertTrue(dashboard.contains("2. Account #2"));
-        assertTrue(dashboard.contains("Max Withdraw: 0"));
+        assertTrue(dashboard.contains("Max Withdraw: Unlimited"));
         assertTrue(dashboard.contains("3. Create an additional account"));
         assertTrue(dashboard.contains("7. Back to customer access"));
         assertTrue(dashboard.contains("8. Exit the app"));
@@ -83,7 +83,7 @@ public class CustomerMenuTest {
         String input = String.join(System.lineSeparator(),
                 "1",
                 "50",
-                "10"
+                "11"
         ) + System.lineSeparator();
         CustomerMenu menu = new CustomerMenu(
                 new Bank(),
@@ -102,7 +102,7 @@ public class CustomerMenuTest {
 
         assertEquals(50.0, customer.getAccounts().get(0).getBalance(), 0.001);
         assertTrue(output.toString().contains("Account #1 Menu:"));
-        assertTrue(output.toString().contains("Maximum withdrawal amount is: 0"));
+        assertTrue(output.toString().contains("Maximum withdrawal amount is: Unlimited"));
         assertTrue(output.toString().contains("Deposit successful."));
     }
 
@@ -116,7 +116,7 @@ public class CustomerMenuTest {
         String input = String.join(System.lineSeparator(),
                 "7",
                 "1",
-                "10"
+                "11"
         ) + System.lineSeparator();
         CustomerMenu menu = new CustomerMenu(
                 new Bank(),
