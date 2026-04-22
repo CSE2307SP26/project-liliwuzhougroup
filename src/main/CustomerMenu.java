@@ -254,14 +254,17 @@ public class CustomerMenu {
     }
 
     public void showAIHelpAssistant() {
+        AIHelpAssistant assistant = new AIHelpAssistant();
         System.out.println("=== AI Help Assistant ===");
         System.out.println("Ask a question about how to use the app (or type 'exit' to go back):");
         io.prepareForTextInput();
-        String question = io.readRequiredText("> ");
-        if (question.equalsIgnoreCase("exit")) {
-            return;
+        while (true) {
+            String question = io.readRequiredText("> ");
+            if (question.equalsIgnoreCase("exit")) {
+                return;
+            }
+            System.out.println(assistant.getResponse(question));
         }
-        System.out.println(new AIHelpAssistant().getResponse(question));
     }
 
     public void manageRecurringPayments() {
@@ -279,6 +282,8 @@ public class CustomerMenu {
 
     public void showBudgetAdvice() {
         System.out.println(new BudgetAdvisor(customer).generateAdvice());
+        io.prepareForTextInput();
+        io.waitForEnter("Press Enter to return to the account dashboard.");
     }
 
     public void setPasswordOrPin() {

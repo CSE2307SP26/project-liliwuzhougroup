@@ -5,6 +5,7 @@ import main.Fee;
 
 import java.util.Date;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
@@ -56,6 +57,26 @@ public class FeeTest {
         } catch (IllegalArgumentException e) {
             fail("Should not throw an exception for valid fee creation");
         }
+    }
+
+    @Test
+    public void testFeeCopiesProvidedDueDate() {
+        Date dueDate = new Date(System.currentTimeMillis() + 86400000);
+        Fee fee = new Fee(15.0, "Late payment fee", dueDate);
+
+        dueDate.setTime(dueDate.getTime() + 86400000);
+
+        assertNotEquals(dueDate, fee.getDueDate());
+    }
+
+    @Test
+    public void testFeeReturnsDefensiveCopyOfDueDate() {
+        Fee fee = new Fee(15.0, "Late payment fee", new Date(System.currentTimeMillis() + 86400000));
+
+        Date returnedDueDate = fee.getDueDate();
+        returnedDueDate.setTime(returnedDueDate.getTime() + 86400000);
+
+        assertNotEquals(returnedDueDate, fee.getDueDate());
     }
 
     @Test

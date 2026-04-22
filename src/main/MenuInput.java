@@ -96,6 +96,12 @@ public final class MenuInput {
         }
     }
 
+    public void waitForEnter(String prompt) {
+        System.out.print(prompt);
+        keyboardInput.nextLine();
+        clearCompletedInputLine();
+    }
+
     private void clearCompletedInputLine() {
         System.out.print(CLEAR_COMPLETED_INPUT_LINE);
         System.out.flush();

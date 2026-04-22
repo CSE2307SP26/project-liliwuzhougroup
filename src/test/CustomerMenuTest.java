@@ -11,6 +11,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.Scanner;
 
 import static org.junit.Assert.assertEquals;
@@ -196,5 +197,91 @@ public class CustomerMenuTest {
         }
 
         assertTrue(output.toString().contains("Insufficient funds to pay this fee."));
+    }
+
+    @Test
+    public void testSelectingAnAccountAllowsViewingMonthlyStatement() {
+        Customer customer = new Customer("Ava");
+        customer.getAccounts().get(0).deposit(120.0);
+        LocalDate today = LocalDate.now();
+        String input = String.join(System.lineSeparator(),
+                "9",
+                String.valueOf(today.getYear()),
+                String.valueOf(today.getMonthValue()),
+                "",
+                "11"
+        ) + System.lineSeparator();
+        CustomerMenu menu = new CustomerMenu(
+                new Bank(),
+                new Scanner(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))),
+                customer
+        );
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        PrintStream originalOutput = System.out;
+
+        try {
+            System.setOut(new PrintStream(output));
+            menu.processInput(1);
+        } finally {
+            System.setOut(originalOutput);
+        }
+
+        String printed = output.toString();
+        assertTrue(printed.contains("Statement for"));
+        assertTrue(printed.contains("Deposited: 120.0"));
+        assertTrue(printed.contains("Press Enter to return to the account menu."));
+    }
+
+    @Test
+    public void testShowAIHelpAssistantAcceptsMultipleQuestionsUntilExit() {
+        Customer customer = new Customer("Ava");
+        String input = String.join(System.lineSeparator(),
+                "How do I transfer money?",
+                "exit"
+        ) + System.lineSeparator();
+        CustomerMenu menu = new CustomerMenu(
+                new Bank(),
+                new Scanner(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))),
+                customer
+        );
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        PrintStream originalOutput = System.out;
+
+        try {
+            System.setOut(new PrintStream(output));
+            menu.showAIHelpAssistant();
+        } finally {
+            System.setOut(originalOutput);
+        }
+
+        String printed = output.toString();
+        assertTrue(printed.contains("=== AI Help Assistant ==="));
+        assertTrue(printed.contains("Ask a question about how to use the app"));
+        assertTrue(printed.contains("Transfer money from this account"));
+    }
+
+    @Test
+    public void testShowBudgetAdviceWaitsBeforeReturningToDashboard() {
+        Customer customer = new Customer("Ava");
+        String input = System.lineSeparator() + System.lineSeparator();
+        CustomerMenu menu = new CustomerMenu(
+                new Bank(),
+                new Scanner(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))),
+                customer
+        );
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        PrintStream originalOutput = System.out;
+
+        try {
+            System.setOut(new PrintStream(output));
+            menu.showBudgetAdvice();
+        } finally {
+            System.setOut(originalOutput);
+        }
+
+        String printed = output.toString();
+        assertTrue(printed.contains("=== AI Budget Advice ==="));
+        assertTrue(printed.contains("No transactions found"));
+        assertTrue(printed.contains("Press Enter to return to the account dashboard."));
     }
 }

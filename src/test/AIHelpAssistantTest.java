@@ -4,8 +4,10 @@ import main.AIHelpAssistant;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class AIHelpAssistantTest {
 
@@ -95,5 +97,15 @@ public class AIHelpAssistantTest {
         String response = assistant.getResponse("How do I see my pending transactions?");
         assertTrue(response.contains("Check transaction history"));
         assertFalse(response.contains("Pay a pending fee"));
+    }
+
+    @Test
+    public void testNullQuestionIsRejected() {
+        try {
+            assistant.getResponse(null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Question cannot be null.", e.getMessage());
+        }
     }
 }

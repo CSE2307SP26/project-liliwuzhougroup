@@ -4,6 +4,9 @@ public final class CustomerRegistrationService {
     private final Bank bank;
 
     public CustomerRegistrationService(Bank bank) {
+        if (bank == null) {
+            throw new IllegalArgumentException("Bank cannot be null.");
+        }
         this.bank = bank;
     }
 

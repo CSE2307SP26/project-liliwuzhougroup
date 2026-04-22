@@ -5,7 +5,9 @@ import main.BudgetAdvisor;
 import main.Customer;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class BudgetAdvisorTest {
 
@@ -105,5 +107,15 @@ public class BudgetAdvisorTest {
 
         String advice = new BudgetAdvisor(customer).generateAdvice();
         assertTrue(advice.contains("no accounts"));
+    }
+
+    @Test
+    public void testConstructorRejectsNullCustomer() {
+        try {
+            new BudgetAdvisor(null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Customer cannot be null.", e.getMessage());
+        }
     }
 }

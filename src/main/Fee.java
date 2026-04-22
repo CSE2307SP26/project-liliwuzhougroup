@@ -3,10 +3,10 @@ package main;
 import java.util.Calendar;
 import java.util.Date;
 
-public class Fee {
-    private double amount;
-    private String description;
-    private Date dueDate;
+public final class Fee {
+    private final double amount;
+    private final String description;
+    private final Date dueDate;
 
     public Fee(double amount, String description, Date dueDate) {
         if (amount < 0) {
@@ -23,7 +23,7 @@ public class Fee {
         if (dueDate.before(getStartOfToday())) {
             throw new IllegalArgumentException("Due date cannot be in the past.");
         }
-        this.dueDate = dueDate;
+        this.dueDate = new Date(dueDate.getTime());
     }
 
     public double getAmount() {
@@ -35,7 +35,7 @@ public class Fee {
     }
 
     public Date getDueDate() {
-        return dueDate;
+        return new Date(dueDate.getTime());
     }
 
     private Date getStartOfToday() {

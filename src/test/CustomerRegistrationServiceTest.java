@@ -76,4 +76,14 @@ public class CustomerRegistrationServiceTest {
             assertEquals("A customer with that email already exists.", e.getMessage());
         }
     }
+
+    @Test
+    public void testConstructorRejectsNullBank() {
+        try {
+            new CustomerRegistrationService(null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Bank cannot be null.", e.getMessage());
+        }
+    }
 }

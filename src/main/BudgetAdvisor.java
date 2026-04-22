@@ -10,6 +10,9 @@ public class BudgetAdvisor {
     private final Customer customer;
 
     public BudgetAdvisor(Customer customer) {
+        if (customer == null) {
+            throw new IllegalArgumentException("Customer cannot be null.");
+        }
         this.customer = customer;
     }
 

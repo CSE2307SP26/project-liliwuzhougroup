@@ -22,6 +22,7 @@ public class MonthlyStatementViewer {
             year = Integer.parseInt(io.readRequiredText("").trim());
         } catch (NumberFormatException e) {
             System.out.println("Invalid year.");
+            pauseBeforeReturning();
             return;
         }
 
@@ -35,6 +36,7 @@ public class MonthlyStatementViewer {
 
         if (transactions.isEmpty()) {
             System.out.println("No transactions found for " + monthLabel + ".");
+            pauseBeforeReturning();
             return;
         }
 
@@ -57,5 +59,11 @@ public class MonthlyStatementViewer {
         System.out.println("Total credits:  " + totalCredits);
         System.out.println("Total debits:   " + totalDebits);
         System.out.println("Net change:     " + (totalCredits - totalDebits));
+        pauseBeforeReturning();
+    }
+
+    private void pauseBeforeReturning() {
+        io.prepareForTextInput();
+        io.waitForEnter("Press Enter to return to the account menu.");
     }
 }

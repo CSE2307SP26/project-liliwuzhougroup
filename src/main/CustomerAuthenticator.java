@@ -4,6 +4,9 @@ public final class CustomerAuthenticator {
     private final Bank bank;
 
     public CustomerAuthenticator(Bank bank) {
+        if (bank == null) {
+            throw new IllegalArgumentException("Bank cannot be null.");
+        }
         this.bank = bank;
     }
 

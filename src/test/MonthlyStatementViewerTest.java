@@ -35,11 +35,16 @@ public class MonthlyStatementViewerTest {
     @Test
     public void testNoTransactionsShowsNotFoundMessage() {
         BankAccount account = new BankAccount();
-        String input = CURRENT_YEAR + System.lineSeparator() + CURRENT_MONTH + System.lineSeparator();
+        String input = String.join(System.lineSeparator(),
+                String.valueOf(CURRENT_YEAR),
+                String.valueOf(CURRENT_MONTH),
+                ""
+        ) + System.lineSeparator();
 
         String output = runViewer(account, input);
 
         assertTrue(output.contains("No transactions found for"));
+        assertTrue(output.contains("Press Enter to return to the account menu."));
     }
 
     @Test
@@ -47,12 +52,17 @@ public class MonthlyStatementViewerTest {
         BankAccount account = new BankAccount();
         account.deposit(200.0);
         account.withdraw(50.0);
-        String input = CURRENT_YEAR + System.lineSeparator() + CURRENT_MONTH + System.lineSeparator();
+        String input = String.join(System.lineSeparator(),
+                String.valueOf(CURRENT_YEAR),
+                String.valueOf(CURRENT_MONTH),
+                ""
+        ) + System.lineSeparator();
 
         String output = runViewer(account, input);
 
         assertTrue(output.contains("Deposited: 200.0"));
         assertTrue(output.contains("Withdrew: 50.0"));
+        assertTrue(output.contains("Press Enter to return to the account menu."));
     }
 
     @Test
@@ -62,7 +72,11 @@ public class MonthlyStatementViewerTest {
 
         int otherMonth = (CURRENT_MONTH % 12) + 1;
         int otherYear = otherMonth == 1 ? CURRENT_YEAR + 1 : CURRENT_YEAR;
-        String input = otherYear + System.lineSeparator() + otherMonth + System.lineSeparator();
+        String input = String.join(System.lineSeparator(),
+                String.valueOf(otherYear),
+                String.valueOf(otherMonth),
+                ""
+        ) + System.lineSeparator();
 
         String output = runViewer(account, input);
 
@@ -75,7 +89,11 @@ public class MonthlyStatementViewerTest {
         BankAccount account = new BankAccount();
         account.deposit(300.0);
         account.withdraw(80.0);
-        String input = CURRENT_YEAR + System.lineSeparator() + CURRENT_MONTH + System.lineSeparator();
+        String input = String.join(System.lineSeparator(),
+                String.valueOf(CURRENT_YEAR),
+                String.valueOf(CURRENT_MONTH),
+                ""
+        ) + System.lineSeparator();
 
         String output = runViewer(account, input);
 
@@ -85,5 +103,20 @@ public class MonthlyStatementViewerTest {
         assertTrue(output.contains("300.0"));
         assertTrue(output.contains("80.0"));
         assertTrue(output.contains("220.0"));
+    }
+
+    @Test
+    public void testInvalidYearShowsErrorAndWaitsBeforeReturning() {
+        BankAccount account = new BankAccount();
+        String input = String.join(System.lineSeparator(),
+                "not-a-year",
+                "",
+                ""
+        ) + System.lineSeparator();
+
+        String output = runViewer(account, input);
+
+        assertTrue(output.contains("Invalid year."));
+        assertTrue(output.contains("Press Enter to return to the account menu."));
     }
 }

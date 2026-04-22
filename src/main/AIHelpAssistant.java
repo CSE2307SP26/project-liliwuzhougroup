@@ -3,6 +3,9 @@ package main;
 public class AIHelpAssistant {
 
     public String getResponse(String question) {
+        if (question == null) {
+            throw new IllegalArgumentException("Question cannot be null.");
+        }
         String q = question.toLowerCase();
 
         if (contains(q, "transfer", "send money", "move money")) {

@@ -25,6 +25,30 @@ public class BankTest {
     }
 
     @Test
+    public void testAddCustomerRejectsNullCustomer() {
+        Bank bank = new Bank();
+
+        try {
+            bank.addCustomer(null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Customer cannot be null.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testRemoveCustomerRejectsNullCustomer() {
+        Bank bank = new Bank();
+
+        try {
+            bank.removeCustomer(null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Customer cannot be null.", e.getMessage());
+        }
+    }
+
+    @Test
     public void testCollectFee() {
         Bank bank = new Bank();
         BankAccount account = new BankAccount();

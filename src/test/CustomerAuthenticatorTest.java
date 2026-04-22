@@ -3,9 +3,11 @@ package test;
 import main.*;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class CustomerAuthenticatorTest {
 
@@ -36,5 +38,15 @@ public class CustomerAuthenticatorTest {
         assertTrue(authenticator.isPinValid(customer, "1234"));
         assertFalse(authenticator.isPasswordValid(customer, "wrong-password"));
         assertFalse(authenticator.isPinValid(customer, "9999"));
+    }
+
+    @Test
+    public void testConstructorRejectsNullBank() {
+        try {
+            new CustomerAuthenticator(null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Bank cannot be null.", e.getMessage());
+        }
     }
 }

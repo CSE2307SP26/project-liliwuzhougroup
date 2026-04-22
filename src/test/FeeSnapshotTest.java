@@ -6,6 +6,7 @@ import org.junit.Test;
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class FeeSnapshotTest {
 
@@ -19,5 +20,15 @@ public class FeeSnapshotTest {
         assertEquals(8.5, restored.getAmount(), 0.01);
         assertEquals("Late fee", restored.getDescription());
         assertEquals(dueDate, restored.getDueDate());
+    }
+
+    @Test
+    public void testConstructorRejectsNullFee() {
+        try {
+            new FeeSnapshot(null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Fee cannot be null.", e.getMessage());
+        }
     }
 }

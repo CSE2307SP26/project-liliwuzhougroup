@@ -11,6 +11,9 @@ public final class FeeSnapshot implements Serializable {
     private final Date dueDate;
 
     public FeeSnapshot(Fee fee) {
+        if (fee == null) {
+            throw new IllegalArgumentException("Fee cannot be null.");
+        }
         this.amount = fee.getAmount();
         this.description = fee.getDescription();
         this.dueDate = fee.getDueDate();

@@ -16,10 +16,16 @@ public class Bank implements Serializable {
     }
 
     public void addCustomer(Customer customer) {
+        if (customer == null) {
+            throw new IllegalArgumentException("Customer cannot be null.");
+        }
         this.customers.add(customer);
     }
 
     public void removeCustomer(Customer customer) {
+        if (customer == null) {
+            throw new IllegalArgumentException("Customer cannot be null.");
+        }
         this.customers.remove(customer);
     }
 
