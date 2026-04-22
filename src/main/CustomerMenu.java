@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 public class CustomerMenu {
 
-    private static final int DASHBOARD_OPTION_COUNT = 6;
+    private static final int DASHBOARD_OPTION_COUNT = 7;
     private static final int ACCOUNT_MENU_BACK_SELECTION = 10;
     private static final int ACCOUNT_MENU_EXIT_SELECTION = 11;
     private static final int ACCOUNT_MENU_MAX_SELECTION = 11;
@@ -58,6 +58,7 @@ public class CustomerMenu {
         System.out.println(option++ + ". Manage recurring payments");
         System.out.println(option++ + ". Update personal information");
         System.out.println(option++ + ". Set password or PIN");
+        System.out.println(option++ + ". AI Budget Advice");
         System.out.println(option++ + ". Back to customer access");
         System.out.println(option + ". Exit the app");
     }
@@ -86,6 +87,10 @@ public class CustomerMenu {
                 return;
             }
             if (selection == accountCount + 5) {
+                showBudgetAdvice();
+                return;
+            }
+            if (selection == accountCount + 6) {
                 System.out.println("Returning to customer access.");
                 return;
             }
@@ -243,6 +248,10 @@ public class CustomerMenu {
         String email = io.readRequiredText("Enter your email: ");
         customer.updatePersonalInformation(address, phoneNumber, email);
         System.out.println("Personal information updated successfully.");
+    }
+
+    public void showBudgetAdvice() {
+        System.out.println(new BudgetAdvisor(customer).generateAdvice());
     }
 
     public void setPasswordOrPin() {
