@@ -36,6 +36,8 @@ This project is a console-based banking application written in Java. It supports
 21. A bank administrator can create a pending fee for a customer account.
 22. A bank customer can pay a pending fee.
 23. A bank customer can receive a warning when a transaction would cause low balance or overdraft risk.
+24. A bank customer should be able to see an AI genereated summary and suggestion based on how many times they withdrawn, deposited and balance on the account.
+25. A bank customer should be able to chat with an AI and ask general question in the chat.
 
 ## Run the Application
 
