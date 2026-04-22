@@ -78,7 +78,7 @@ public class BankAccountTest {
         BankAccount account = new BankAccount();
 
         assertEquals(0, account.getMaxWithdrawAmount(), 0.01);
-        assertEquals("0", account.getDisplayMaxWithdrawAmount());
+        assertEquals("Unlimited", account.getDisplayMaxWithdrawAmount());
     }
 
     @Test
@@ -413,7 +413,7 @@ public class BankAccountTest {
         BankAccount account = new BankAccount(0, "", false, Double.MAX_VALUE);
 
         assertEquals(0, account.getMaxWithdrawAmount(), 0.01);
-        assertEquals("0", account.getDisplayMaxWithdrawAmount());
+        assertEquals("Unlimited", account.getDisplayMaxWithdrawAmount());
     }
 
     @Test

@@ -131,6 +131,9 @@ public class BankAccount implements Serializable {
     }
 
     public String getDisplayMaxWithdrawAmount() {
+        if (!hasMaxWithdrawLimit()) {
+            return "Unlimited";
+        }
         return formatDisplayAmount(maxWithdrawAmount);
     }
 
