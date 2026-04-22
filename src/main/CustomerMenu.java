@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 public class CustomerMenu {
 
-    private static final int DASHBOARD_OPTION_COUNT = 7;
+    private static final int DASHBOARD_OPTION_COUNT = 8;
     private static final int ACCOUNT_MENU_BACK_SELECTION = 11;
     private static final int ACCOUNT_MENU_EXIT_SELECTION = 12;
     private static final int ACCOUNT_MENU_MAX_SELECTION = 12;
@@ -56,6 +56,7 @@ public class CustomerMenu {
         int option = customer.getAccounts().size() + 1;
         System.out.println(option++ + ". Create an additional account");
         System.out.println(option++ + ". Manage recurring payments");
+        System.out.println(option++ + ". AI Help Assistant");
         System.out.println(option++ + ". Update personal information");
         System.out.println(option++ + ". Set password or PIN");
         System.out.println(option++ + ". AI Budget Advice");
@@ -79,18 +80,22 @@ public class CustomerMenu {
                 return;
             }
             if (selection == accountCount + 3) {
-                updatePersonalInformation();
+                showAIHelpAssistant();
                 return;
             }
             if (selection == accountCount + 4) {
-                setPasswordOrPin();
+                updatePersonalInformation();
                 return;
             }
             if (selection == accountCount + 5) {
-                showBudgetAdvice();
+                setPasswordOrPin();
                 return;
             }
             if (selection == accountCount + 6) {
+                showBudgetAdvice();
+                return;
+            }
+            if (selection == accountCount + 7) {
                 System.out.println("Returning to customer access.");
                 return;
             }
@@ -246,6 +251,17 @@ public class CustomerMenu {
 
     public void viewMonthlyStatement(BankAccount account) {
         new MonthlyStatementViewer(keyboardInput, account).viewMonthlyStatement();
+    }
+
+    public void showAIHelpAssistant() {
+        System.out.println("=== AI Help Assistant ===");
+        System.out.println("Ask a question about how to use the app (or type 'exit' to go back):");
+        io.prepareForTextInput();
+        String question = io.readRequiredText("> ");
+        if (question.equalsIgnoreCase("exit")) {
+            return;
+        }
+        System.out.println(new AIHelpAssistant().getResponse(question));
     }
 
     public void manageRecurringPayments() {

@@ -27,7 +27,7 @@ public class CustomerAccessPortalTest {
                 "(555) 123-4567",
                 "password123",
                 "2",
-                "7",
+                "8",
                 "3"
         ) + System.lineSeparator();
 
@@ -55,7 +55,7 @@ public class CustomerAccessPortalTest {
                 "(555) 123-4567",
                 "password123",
                 "2",
-                "7",
+                "8",
                 "3"
         ) + System.lineSeparator();
 
@@ -110,7 +110,7 @@ public class CustomerAccessPortalTest {
                 SampleBankFactory.SAMPLE_CUSTOMER_EMAIL,
                 "1",
                 SampleBankFactory.SAMPLE_CUSTOMER_PASSWORD,
-                "8",
+                "9",
                 "3"
         ) + System.lineSeparator();
 
@@ -128,7 +128,7 @@ public class CustomerAccessPortalTest {
                 SampleBankFactory.SAMPLE_CUSTOMER_EMAIL,
                 "2",
                 SampleBankFactory.SAMPLE_CUSTOMER_PIN,
-                "8",
+                "9",
                 "3"
         ) + System.lineSeparator();
 

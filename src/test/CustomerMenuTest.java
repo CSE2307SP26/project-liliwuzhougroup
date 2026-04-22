@@ -54,9 +54,10 @@ public class CustomerMenuTest {
         assertTrue(dashboard.contains("2. Account #2"));
         assertTrue(dashboard.contains("Max Withdraw: Unlimited"));
         assertTrue(dashboard.contains("3. Create an additional account"));
-        assertTrue(dashboard.contains("7. AI Budget Advice"));
-        assertTrue(dashboard.contains("8. Back to customer access"));
-        assertTrue(dashboard.contains("9. Exit the app"));
+        assertTrue(dashboard.contains("5. AI Help Assistant"));
+        assertTrue(dashboard.contains("8. AI Budget Advice"));
+        assertTrue(dashboard.contains("9. Back to customer access"));
+        assertTrue(dashboard.contains("10. Exit the app"));
     }
 
     @Test
@@ -69,7 +70,7 @@ public class CustomerMenuTest {
 
         try {
             System.setOut(new PrintStream(output));
-            menu.processInput(9);
+            menu.processInput(10);
             fail();
         } catch (MainMenu.ExitRequested e) {
             assertTrue(output.toString().contains("Thank you for using the 237 Bank App!"));
