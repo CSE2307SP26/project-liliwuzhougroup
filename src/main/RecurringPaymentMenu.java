@@ -4,70 +4,83 @@ import java.util.List;
 import java.util.Scanner;
 
 public class RecurringPaymentMenu {
+    private static final int BACK_SELECTION = 5;
+    private static final int EXIT_SELECTION = 6;
+    private static final int MAX_SELECTION = 6;
+    private static final String SETUP_REQUIRES_TWO_ACCOUNTS_MESSAGE =
+            "Recurring payments require at least two accounts. "
+                    + "Create another account from the customer dashboard first.";
 
-    private final Scanner scanner;
+    private final MenuInput io;
     private final Customer customer;
 
     public RecurringPaymentMenu(Scanner scanner, Customer customer) {
-        this.scanner = scanner;
+        this.io = new MenuInput(scanner);
         this.customer = customer;
     }
 
     public void run() {
-        int sel = -1;
-        while (sel != 5) {
-            System.out.println("\n--- Recurring Payments ---");
-            System.out.println("1. Set up a new recurring payment");
-            System.out.println("2. View all recurring payments");
-            System.out.println("3. Process all recurring payments now");
-            System.out.println("4. Cancel a recurring payment");
-            System.out.println("5. Back to main menu");
-            sel = getUserSelection(5);
-            if (sel == 1) setupPayment();
-            else if (sel == 2) viewPayments();
-            else if (sel == 3) processAllPayments();
-            else if (sel == 4) cancelPayment();
+        int selection = -1;
+        while (selection != BACK_SELECTION) {
+            displayOptions();
+            selection = io.readSelection(MAX_SELECTION);
+            processInput(selection);
         }
     }
 
-    private void setupPayment() {
-        List<BankAccount> accounts = customer.getAccounts();
-        if (accounts.size() < 2) {
-            System.out.println("You need at least 2 accounts to set up a recurring payment.");
-            return;
+    public void displayOptions() {
+        MenuScreen.redraw();
+        System.out.println("\n--- Recurring Payments ---");
+        if (canSetupPayment()) {
+            System.out.println("1. Set up a new recurring payment");
+        } else {
+            System.out.println("1. Set up a new recurring payment (requires at least 2 accounts)");
         }
-        System.out.print("Enter a description: ");
-        scanner.nextLine();
-        String description = scanner.nextLine().trim();
+        System.out.println("2. View all recurring payments");
+        System.out.println("3. Process all recurring payments now");
+        System.out.println("4. Cancel a recurring payment");
+        System.out.println("5. Back to previous menu");
+        System.out.println("6. Exit the app");
+    }
 
-        System.out.println("Select source account:");
-        printAccounts(accounts);
-        int sourceIndex = getUserSelection(accounts.size()) - 1;
-
-        System.out.println("Select target account:");
-        printAccounts(accounts);
-        int targetIndex = getUserSelection(accounts.size()) - 1;
-
-        if (sourceIndex == targetIndex) {
-            System.out.println("Source and target accounts must be different.");
-            return;
-        }
-
-        double amount = readPositiveAmount("Enter amount: ");
-
-        System.out.println("Select frequency: 1=Daily  2=Weekly  3=Monthly");
-        RecurringPayment.Frequency[] freqs = RecurringPayment.Frequency.values();
-        RecurringPayment.Frequency frequency = freqs[getUserSelection(3) - 1];
-
+    public void processInput(int selection) {
         try {
-            customer.setupRecurringPayment(description, sourceIndex, targetIndex, amount, frequency);
-            System.out.println("Recurring payment set up successfully.");
-        } catch (IllegalArgumentException e) {
+            if (selection == BACK_SELECTION) {
+                System.out.println("Returning to previous menu.");
+                return;
+            }
+            if (selection == EXIT_SELECTION) {
+                MainMenu.requestExit();
+                return;
+            }
+            if (selection == 1 && !canSetupPayment()) {
+                System.out.println(SETUP_REQUIRES_TWO_ACCOUNTS_MESSAGE);
+                return;
+            }
+            if (runPaymentAction(selection)) {
+                return;
+            }
+            System.out.println("Invalid selection.");
+        } catch (IllegalArgumentException | IllegalStateException e) {
             System.out.println(e.getMessage());
         }
     }
 
-    private void viewPayments() {
+    public void setupPayment() {
+        List<BankAccount> accounts = customer.getAccounts();
+        if (accounts.size() < 2) {
+            throw new IllegalStateException("At least two accounts are required for recurring payments.");
+        }
+        io.prepareForTextInput();
+        String description = io.readRequiredText("Enter a description: ");
+        int sourceIndex = selectAccountIndex(accounts, "Select source account:");
+        int targetIndex = selectTargetIndex(accounts, sourceIndex);
+        double amount = io.readPositiveAmount("Enter amount: ");
+        customer.setupRecurringPayment(description, sourceIndex, targetIndex, amount, readFrequency());
+        System.out.println("Recurring payment set up successfully.");
+    }
+
+    public void viewPayments() {
         List<RecurringPayment> payments = customer.getRecurringPayments();
         if (payments.isEmpty()) {
             System.out.println("No recurring payments set up.");
@@ -78,35 +91,56 @@ public class RecurringPaymentMenu {
         }
     }
 
-    private void processAllPayments() {
+    public void processAllPayments() {
         if (customer.getRecurringPayments().isEmpty()) {
             System.out.println("No recurring payments to process.");
             return;
         }
-        try {
-            int processedCount = customer.processRecurringPayments();
-            if (processedCount == 0) {
-                System.out.println("No recurring payments are due today.");
-            } else {
-                System.out.println(processedCount + " recurring payment(s) processed.");
-            }
-        } catch (IllegalArgumentException | IndexOutOfBoundsException e) {
-            System.out.println("A payment failed: " + e.getMessage());
-        } catch (IllegalStateException e) {
-            System.out.println("Recurring payment could not be processed: " + e.getMessage());
+        int processedCount = customer.processRecurringPayments();
+        if (processedCount == 0) {
+            System.out.println("No recurring payments are due today.");
+            return;
+        }
+        System.out.println(processedCount + " recurring payment(s) processed.");
+    }
+
+    public void cancelPayment() {
+        if (customer.getRecurringPayments().isEmpty()) {
+            throw new IllegalStateException("No recurring payments to cancel.");
+        }
+        viewPayments();
+        int index = io.readSelection(customer.getRecurringPayments().size()) - 1;
+        customer.cancelRecurringPayment(index);
+        System.out.println("Recurring payment cancelled.");
+    }
+
+    private boolean runPaymentAction(int selection) {
+        switch (selection) {
+            case 1: setupPayment(); return true;
+            case 2: viewPayments(); return true;
+            case 3: processAllPayments(); return true;
+            case 4: cancelPayment(); return true;
+            default: return false;
         }
     }
 
-    private void cancelPayment() {
-        if (customer.getRecurringPayments().isEmpty()) {
-            System.out.println("No recurring payments to cancel.");
-            return;
+    private boolean canSetupPayment() {
+        return customer.getAccounts().size() >= 2;
+    }
+
+    private int selectAccountIndex(List<BankAccount> accounts, String prompt) {
+        System.out.println(prompt);
+        printAccounts(accounts);
+        return io.readSelection(accounts.size()) - 1;
+    }
+
+    private int selectTargetIndex(List<BankAccount> accounts, int sourceIndex) {
+        int targetIndex = selectAccountIndex(accounts, "Select target account:");
+        while (targetIndex == sourceIndex) {
+            System.out.println("Source and target accounts must be different.");
+            targetIndex = selectAccountIndex(accounts, "Select target account:");
         }
-        viewPayments();
-        System.out.println("Enter the number of the payment to cancel:");
-        int index = getUserSelection(customer.getRecurringPayments().size()) - 1;
-        customer.cancelRecurringPayment(index);
-        System.out.println("Recurring payment cancelled.");
+        return targetIndex;
     }
 
     private void printAccounts(List<BankAccount> accounts) {
@@ -116,29 +150,9 @@ public class RecurringPaymentMenu {
         }
     }
 
-    private int getUserSelection(int max) {
-        int selection = -1;
-        while (selection < 1 || selection > max) {
-            System.out.print("Please make a selection: ");
-            if (scanner.hasNextInt()) {
-                selection = scanner.nextInt();
-            } else {
-                scanner.next();
-            }
-        }
-        return selection;
-    }
-
-    private double readPositiveAmount(String prompt) {
-        double amount = -1;
-        while (amount <= 0) {
-            System.out.print(prompt);
-            if (scanner.hasNextDouble()) {
-                amount = scanner.nextDouble();
-            } else {
-                scanner.next();
-            }
-        }
-        return amount;
+    private RecurringPayment.Frequency readFrequency() {
+        System.out.println("Select frequency: 1=Daily  2=Weekly  3=Monthly");
+        RecurringPayment.Frequency[] frequencies = RecurringPayment.Frequency.values();
+        return frequencies[io.readSelection(frequencies.length) - 1];
     }
 }

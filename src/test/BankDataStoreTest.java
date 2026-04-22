@@ -6,6 +6,7 @@ import main.BankDataStore;
 import main.Customer;
 import main.Fee;
 import main.RecurringPayment;
+import main.SampleBankFactory;
 import org.junit.Test;
 
 import java.io.File;
@@ -67,6 +68,11 @@ public class BankDataStoreTest {
         assertEquals("Monthly fee", loadedFirstAccount.getRemainingFees().get(0).getDescription());
         assertEquals(dueDate, loadedFirstAccount.getRemainingFees().get(0).getDueDate());
         assertTrue(loadedFirstAccount.getTransactionHistory().contains("Deposited: 300.0"));
+        assertEquals(
+                1,
+                loadedFirstAccount.getTransactionsByYearMonth(LocalDate.now().getYear(), LocalDate.now().getMonthValue())
+                        .size()
+        );
 
         BankAccount loadedSecondAccount = loadedCustomer.getAccounts().get(1);
         assertTrue(loadedSecondAccount.isFrozen());
@@ -91,5 +97,21 @@ public class BankDataStoreTest {
 
         assertNotNull(bank);
         assertTrue(bank.getCustomers().isEmpty());
+    }
+
+    @Test
+    public void testDefaultLoadBankAddsSampleCustomerWhenSavedDataDoesNotContainIt() throws IOException {
+        File dataFile = File.createTempFile("bank-data-store-default", ".dat");
+        dataFile.deleteOnExit();
+
+        BankDataStore.saveBank(new Bank(), dataFile);
+
+        Bank bank = BankDataStore.loadBank(dataFile, true);
+        Customer sampleCustomer = bank.findCustomerByEmail(SampleBankFactory.SAMPLE_CUSTOMER_EMAIL);
+
+        assertNotNull(sampleCustomer);
+        assertEquals(1, bank.getCustomers().size());
+        assertEquals(SampleBankFactory.SAMPLE_CUSTOMER_NAME, sampleCustomer.getName());
+        assertEquals(2, sampleCustomer.getAccounts().size());
     }
 }

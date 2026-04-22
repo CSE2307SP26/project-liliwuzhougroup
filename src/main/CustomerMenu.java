@@ -5,11 +5,15 @@ import java.util.Scanner;
 
 public class CustomerMenu {
 
-    protected static final int CUSTOMER_EXIT_SELECTION = 11;
-    protected static final int CUSTOMER_MAX_SELECTION = 11;
+    private static final int DASHBOARD_OPTION_COUNT = 8;
+    private static final int ACCOUNT_MENU_BACK_SELECTION = 11;
+    private static final int ACCOUNT_MENU_EXIT_SELECTION = 12;
+    private static final int ACCOUNT_MENU_MAX_SELECTION = 12;
 
     protected final Scanner keyboardInput;
     protected final Bank bank;
+    protected final MenuInput io;
+    protected final CustomerAccountSelector accountSelector;
     protected Customer customer;
 
     public CustomerMenu(Bank bank, Customer customer) {
@@ -19,6 +23,8 @@ public class CustomerMenu {
     public CustomerMenu(Bank bank, Scanner keyboardInput, Customer customer) {
         this.bank = bank;
         this.keyboardInput = keyboardInput;
+        this.io = new MenuInput(keyboardInput);
+        this.accountSelector = new CustomerAccountSelector(io);
         this.customer = customer;
     }
 
@@ -32,68 +38,68 @@ public class CustomerMenu {
 
     public void run() {
         int selection = -1;
-        while (selection != CUSTOMER_EXIT_SELECTION) {
+        while (selection != getDashboardBackSelection()) {
             displayOptions();
-            selection = getUserSelection(CUSTOMER_MAX_SELECTION);
+            selection = io.readSelection(getDashboardMaxSelection());
             processInput(selection);
         }
     }
 
     public void displayOptions() {
-        System.out.println("Customer Menu:");
-        System.out.println("1. Make a deposit");
-        System.out.println("2. Make a withdrawal");
-        System.out.println("3. Check account balance");
-        System.out.println("4. Check transaction history");
-        System.out.println("5. Create an additional account");
-        System.out.println("6. Close an existing account");
-        System.out.println("7. Transfer money between your accounts");
-        System.out.println("8. Manage recurring payments");
-        System.out.println("9. Update personal information");
-        System.out.println("10. Set password or PIN");
-        System.out.println("11. Back to main menu");
+        MenuScreen.redraw();
+        System.out.println("Account Dashboard:");
+        if (customer.getAccounts().isEmpty()) {
+            System.out.println("No accounts available.");
+        } else {
+            accountSelector.displayAccounts(customer.getAccounts());
+        }
+        int option = customer.getAccounts().size() + 1;
+        System.out.println(option++ + ". Create an additional account");
+        System.out.println(option++ + ". Manage recurring payments");
+        System.out.println(option++ + ". AI Help Assistant");
+        System.out.println(option++ + ". Update personal information");
+        System.out.println(option++ + ". Set password or PIN");
+        System.out.println(option++ + ". AI Budget Advice");
+        System.out.println(option++ + ". Back to customer access");
+        System.out.println(option + ". Exit the app");
     }
 
     public void processInput(int selection) {
         try {
-            switch (selection) {
-                case 1:
-                    performDeposit();
-                    break;
-                case 2:
-                    performWithdrawal();
-                    break;
-                case 3:
-                    displayBalance();
-                    break;
-                case 4:
-                    displayTransactionHistory();
-                    break;
-                case 5:
-                    createAdditionalAccount();
-                    break;
-                case 6:
-                    closeExistingAccount();
-                    break;
-                case 7:
-                    transferBetweenAccounts();
-                    break;
-                case 8:
-                    manageRecurringPayments();
-                    break;
-                case 9:
-                    updatePersonalInformation();
-                    break;
-                case 10:
-                    setPasswordOrPin();
-                    break;
-                case 11:
-                    System.out.println("Leaving customer menu.");
-                    break;
-                default:
-                    System.out.println("Invalid selection.");
-                    break;
+            int accountCount = customer.getAccounts().size();
+            if (selection <= accountCount) {
+                openAccountMenu(customer.getAccounts().get(selection - 1));
+                return;
             }
+            if (selection == accountCount + 1) {
+                createAdditionalAccount();
+                return;
+            }
+            if (selection == accountCount + 2) {
+                manageRecurringPayments();
+                return;
+            }
+            if (selection == accountCount + 3) {
+                showAIHelpAssistant();
+                return;
+            }
+            if (selection == accountCount + 4) {
+                updatePersonalInformation();
+                return;
+            }
+            if (selection == accountCount + 5) {
+                setPasswordOrPin();
+                return;
+            }
+            if (selection == accountCount + 6) {
+                showBudgetAdvice();
+                return;
+            }
+            if (selection == accountCount + 7) {
+                System.out.println("Returning to customer access.");
+                return;
+            }
+            MainMenu.requestExit();
         } catch (IllegalStateException | IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }
@@ -103,29 +109,26 @@ public class CustomerMenu {
         this.customer = customer;
     }
 
-    protected int getUserSelection(int max) {
-        int selection = -1;
-        while (selection < 1 || selection > max) {
-            System.out.print("Please make a selection: ");
-            if (keyboardInput.hasNextInt()) {
-                selection = keyboardInput.nextInt();
-            } else {
-                keyboardInput.next();
-            }
-        }
-        return selection;
+    public void performDeposit() {
+        performDeposit(accountSelector.selectAccount(customer, "deposit into"));
     }
 
-    public void performDeposit() {
-        BankAccount account = selectAccount("deposit into");
-        double depositAmount = readPositiveAmount("How much would you like to deposit: ");
+    public void performDeposit(BankAccount account) {
+        double depositAmount = io.readPositiveAmount("How much would you like to deposit: ");
         account.deposit(depositAmount);
         System.out.println("Deposit successful.");
     }
 
     public void performWithdrawal() {
-        BankAccount account = selectAccount("withdraw from");
-        double withdrawAmount = readPositiveAmount("How much would you like to withdraw: ");
+        performWithdrawal(accountSelector.selectAccount(customer, "withdraw from"));
+    }
+
+    public void performWithdrawal(BankAccount account) {
+        double withdrawAmount = io.readPositiveAmount("How much would you like to withdraw: ");
+        if (!new LowBalanceWarning(keyboardInput).confirmIfNeeded(account, withdrawAmount)) {
+            System.out.println("Withdrawal cancelled.");
+            return;
+        }
         try {
             account.withdraw(withdrawAmount);
             System.out.println("Withdrawal successful.");
@@ -135,15 +138,21 @@ public class CustomerMenu {
     }
 
     public void displayBalance() {
-        BankAccount account = selectAccount("check balance for");
+        displayBalance(accountSelector.selectAccount(customer, "check balance for"));
+    }
+
+    public void displayBalance(BankAccount account) {
         String status = account.isFrozen() ? "Frozen" : "Active";
         System.out.println("Your current balance is: " + account.getBalance());
         System.out.println("Account status: " + status);
-        System.out.println("Maximum withdrawal amount is: " + account.getMaxWithdrawAmount());
+        System.out.println("Maximum withdrawal amount is: " + account.getDisplayMaxWithdrawAmount());
     }
 
     public void displayTransactionHistory() {
-        BankAccount account = selectAccount("view transaction history for");
+        displayTransactionHistory(accountSelector.selectAccount(customer, "view transaction history for"));
+    }
+
+    public void displayTransactionHistory(BankAccount account) {
         System.out.println("Transaction History:");
         String history = account.getTransactionHistory();
         System.out.println(history.isEmpty() ? "No transactions yet." : history);
@@ -155,7 +164,10 @@ public class CustomerMenu {
     }
 
     public void closeExistingAccount() {
-        BankAccount account = selectAccount("close");
+        closeExistingAccount(accountSelector.selectAccount(customer, "close"));
+    }
+
+    public void closeExistingAccount(BankAccount account) {
         try {
             customer.closeAccount(account);
             System.out.println("Account closed successfully.");
@@ -165,23 +177,43 @@ public class CustomerMenu {
     }
 
     public void transferBetweenAccounts() {
+        if (customer.getAccounts().size() < 2) {
+            throw new IllegalStateException("At least two accounts are required to transfer money.");
+        }
         System.out.println("Select source account:");
-        BankAccount sourceAccount = selectAccount("transfer money from");
-        System.out.println("Select target account:");
-        BankAccount targetAccount = selectAccount("transfer money to");
-        double amount = readPositiveAmount("How much would you like to transfer: ");
+        BankAccount sourceAccount = accountSelector.selectAccount(customer, "transfer money from");
+        transferBetweenAccounts(sourceAccount);
+    }
 
+    public void transferBetweenAccounts(BankAccount sourceAccount) {
+        if (customer.getAccounts().size() < 2) {
+            throw new IllegalStateException("At least two accounts are required to transfer money.");
+        }
+        System.out.println("Select target account:");
+        BankAccount targetAccount = accountSelector.selectAccount(customer, "transfer money to");
+        while (sourceAccount == targetAccount) {
+            System.out.println("Source and target accounts must be different.");
+            targetAccount = accountSelector.selectAccount(customer, "transfer money to");
+        }
+        double amount = io.readPositiveAmount("How much would you like to transfer: ");
+        if (!new LowBalanceWarning(keyboardInput).confirmIfNeeded(sourceAccount, amount)) {
+            System.out.println("Transfer cancelled.");
+            return;
+        }
         try {
             sourceAccount.transferMoney(targetAccount, amount);
             System.out.println("Transfer successful.");
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | IllegalStateException e) {
             System.out.println(e.getMessage());
         }
     }
 
     public void setMaximumWithdrawalAmount() {
-        BankAccount account = selectAccount("set maximum withdrawal amount for");
-        double maxAmount = readPositiveAmount("Enter the maximum withdrawal amount: ");
+        setMaximumWithdrawalAmount(accountSelector.selectAccount(customer, "set maximum withdrawal amount for"));
+    }
+
+    public void setMaximumWithdrawalAmount(BankAccount account) {
+        double maxAmount = io.readPositiveAmount("Enter the maximum withdrawal amount: ");
         try {
             account.setMaxWithdrawAmount(maxAmount);
             System.out.println("Maximum withdrawal amount updated successfully.");
@@ -190,11 +222,48 @@ public class CustomerMenu {
         }
     }
 
-    public void displayRemainingFees(BankAccount account) {
+    public void payPendingFee(BankAccount account) {
         List<Fee> fees = account.getRemainingFees();
+        if (fees.isEmpty()) {
+            throw new IllegalStateException("There are no pending fees to pay.");
+        }
+
+        System.out.println("Select a fee to pay:");
         for (int i = 0; i < fees.size(); i++) {
             Fee fee = fees.get(i);
-            System.out.println("You have " + fee.getAmount() + " due for " + fee.getDescription() + " on " + fee.getDueDate() + ".");
+            System.out.println((i + 1) + ". " + fee.getDescription()
+                    + " - Amount: " + fee.getAmount()
+                    + ", Due: " + fee.getDueDate());
+        }
+
+        int selectedFee = io.readSelection(fees.size()) - 1;
+        try {
+            account.payFee(selectedFee);
+            System.out.println("Fee paid successfully.");
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void setLowBalanceThreshold(BankAccount account) {
+        new LowBalanceWarning(keyboardInput).setThreshold(account);
+    }
+
+    public void viewMonthlyStatement(BankAccount account) {
+        new MonthlyStatementViewer(keyboardInput, account).viewMonthlyStatement();
+    }
+
+    public void showAIHelpAssistant() {
+        AIHelpAssistant assistant = new AIHelpAssistant();
+        System.out.println("=== AI Help Assistant ===");
+        System.out.println("Ask a question about how to use the app (or type 'exit' to go back):");
+        io.prepareForTextInput();
+        while (true) {
+            String question = io.readRequiredText("> ");
+            if (question.equalsIgnoreCase("exit")) {
+                return;
+            }
+            System.out.println(assistant.getResponse(question));
         }
     }
 
@@ -203,76 +272,94 @@ public class CustomerMenu {
     }
 
     public void updatePersonalInformation() {
-        keyboardInput.skip("\\R?");
-        String address = readRequiredText("Enter your address: ");
-        String phoneNumber = readRequiredText("Enter your phone number: ");
-        String email = readRequiredText("Enter your email: ");
-
+        io.prepareForTextInput();
+        String address = io.readRequiredText("Enter your address: ");
+        String phoneNumber = io.readPhoneNumber("Enter your phone number: ");
+        String email = io.readRequiredText("Enter your email: ");
         customer.updatePersonalInformation(address, phoneNumber, email);
         System.out.println("Personal information updated successfully.");
     }
 
+    public void showBudgetAdvice() {
+        System.out.println(new BudgetAdvisor(customer).generateAdvice());
+        io.prepareForTextInput();
+        io.waitForEnter("Press Enter to return to the account dashboard.");
+    }
+
     public void setPasswordOrPin() {
-        keyboardInput.skip("\\R?");
+        io.prepareForTextInput();
         System.out.println("1. Set password");
         System.out.println("2. Set PIN");
-        int choice = getUserSelection(2);
-        keyboardInput.skip("\\R?");
-
+        int choice = io.readSelection(2);
+        io.prepareForTextInput();
         if (choice == 1) {
-            String password = readRequiredText("Enter your new password: ");
-            customer.setPassword(password);
+            customer.setPassword(io.readRequiredText("Enter your new password: "));
             System.out.println("Password set successfully.");
             return;
         }
-
-        System.out.print("Enter your 4-digit PIN: ");
-        String pin = keyboardInput.nextLine().trim();
-        customer.setPin(pin);
+        customer.setPin(io.readPin("Enter your 4-digit PIN: "));
         System.out.println("PIN set successfully.");
     }
 
-    protected BankAccount selectAccount(String action) {
-        List<BankAccount> accounts = customer.getAccounts();
-        if (accounts.isEmpty()) {
-            throw new IllegalStateException("No accounts available to " + action + ".");
-        }
-
-        System.out.println("Select account to " + action + ":");
-        for (int i = 0; i < accounts.size(); i++) {
-            BankAccount account = accounts.get(i);
-            String status = account.isFrozen() ? "Frozen" : "Active";
-            System.out.println((i + 1) + ". Account #" + (i + 1)
-                    + " (Balance: " + account.getBalance()
-                    + ", Status: " + status
-                    + ", Max Withdraw: " + account.getMaxWithdrawAmount() + ")");
-        }
-
-        int selectedAccount = getUserSelection(accounts.size());
-        BankAccount account = accounts.get(selectedAccount - 1);
-        displayRemainingFees(account);
-        return account;
-    }
-
-    protected double readPositiveAmount(String prompt) {
-        double amount = -1;
-        while (amount <= 0) {
-            System.out.print(prompt);
-            if (keyboardInput.hasNextDouble()) {
-                amount = keyboardInput.nextDouble();
-            } else {
-                keyboardInput.next();
+    private void openAccountMenu(BankAccount account) {
+        while (customer.getAccounts().contains(account)) {
+            displayAccountOptions(account);
+            int selection = io.readSelection(ACCOUNT_MENU_MAX_SELECTION);
+            if (processAccountSelection(account, selection)) {
+                return;
             }
         }
-        return amount;
     }
 
-    protected String readRequiredText(String prompt) {
-        String value = "";
-        while (value.trim().isEmpty()) {
-            System.out.print(prompt);
-            value = keyboardInput.nextLine();
+    private void displayAccountOptions(BankAccount account) {
+        MenuScreen.redraw();
+        int accountNumber = customer.getAccounts().indexOf(account) + 1;
+        System.out.println("Account #" + accountNumber + " Menu:");
+        displayBalance(account);
+        accountSelector.displayRemainingFees(account);
+        System.out.println("1. Make a deposit");
+        System.out.println("2. Make a withdrawal");
+        System.out.println("3. Check account balance");
+        System.out.println("4. Check transaction history");
+        System.out.println("5. Transfer money from this account");
+        System.out.println("6. Set maximum withdrawal amount");
+        System.out.println("7. Pay a pending fee");
+        System.out.println("8. Set low balance threshold");
+        System.out.println("9. View monthly statement");
+        System.out.println("10. Close this account");
+        System.out.println("11. Back to account dashboard");
+        System.out.println("12. Exit the app");
+    }
+
+    private boolean processAccountSelection(BankAccount account, int selection) {
+        switch (selection) {
+            case 1: performDeposit(account); return false;
+            case 2: performWithdrawal(account); return false;
+            case 3: displayBalance(account); return false;
+            case 4: displayTransactionHistory(account); return false;
+            case 5: transferBetweenAccounts(account); return false;
+            case 6: setMaximumWithdrawalAmount(account); return false;
+            case 7: payPendingFee(account); return false;
+            case 8: setLowBalanceThreshold(account); return false;
+            case 9: viewMonthlyStatement(account); return false;
+            case 10:
+                closeExistingAccount(account);
+                return !customer.getAccounts().contains(account);
+            case ACCOUNT_MENU_BACK_SELECTION:
+                System.out.println("Returning to account dashboard.");
+                return true;
+            case ACCOUNT_MENU_EXIT_SELECTION:
+                MainMenu.requestExit();
+                return true;
+            default: return false;
         }
-        return value.trim();
+    }
+
+    private int getDashboardMaxSelection() {
+        return customer.getAccounts().size() + DASHBOARD_OPTION_COUNT;
+    }
+
+    private int getDashboardBackSelection() {
+        return customer.getAccounts().size() + DASHBOARD_OPTION_COUNT - 1;
     }
 }

@@ -3,20 +3,23 @@ package main;
 import java.io.Serializable;
 import java.util.Date;
 
-final class FeeSnapshot implements Serializable {
+public final class FeeSnapshot implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final double amount;
     private final String description;
     private final Date dueDate;
 
-    FeeSnapshot(Fee fee) {
+    public FeeSnapshot(Fee fee) {
+        if (fee == null) {
+            throw new IllegalArgumentException("Fee cannot be null.");
+        }
         this.amount = fee.getAmount();
         this.description = fee.getDescription();
         this.dueDate = fee.getDueDate();
     }
 
-    Fee toFee() {
+    public Fee toFee() {
         return new Fee(amount, description, dueDate);
     }
 }

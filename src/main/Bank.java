@@ -3,6 +3,7 @@ package main;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 public class Bank implements Serializable {
@@ -15,15 +16,34 @@ public class Bank implements Serializable {
     }
 
     public void addCustomer(Customer customer) {
+        if (customer == null) {
+            throw new IllegalArgumentException("Customer cannot be null.");
+        }
         this.customers.add(customer);
     }
 
     public void removeCustomer(Customer customer) {
+        if (customer == null) {
+            throw new IllegalArgumentException("Customer cannot be null.");
+        }
         this.customers.remove(customer);
     }
 
     public List<Customer> getCustomers() {
         return Collections.unmodifiableList(customers);
+    }
+
+    public Customer findCustomerByEmail(String email) {
+        String normalizedEmail = normalizeEmail(email);
+        if (normalizedEmail.isEmpty()) {
+            return null;
+        }
+        for (Customer customer : customers) {
+            if (normalizedEmail.equals(normalizeEmail(customer.getEmail()))) {
+                return customer;
+            }
+        }
+        return null;
     }
 
     public void collectFee(BankAccount account, double feeAmount) {
@@ -38,6 +58,13 @@ public class Bank implements Serializable {
             throw new IllegalArgumentException("Account cannot be null.");
         }
         account.addInterest(interestAmount);
+    }
+
+    public void createPendingFee(BankAccount account, double feeAmount, String description, Date dueDate) {
+        if (account == null) {
+            throw new IllegalArgumentException("Account cannot be null.");
+        }
+        account.createFee(new Fee(feeAmount, description, dueDate));
     }
 
     public void freezeAccount(BankAccount account) {
@@ -72,5 +99,9 @@ public class Bank implements Serializable {
             }
         }
         return historyBuilder.toString().trim();
+    }
+
+    private String normalizeEmail(String email) {
+        return email == null ? "" : email.trim().toLowerCase();
     }
 }

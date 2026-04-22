@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-final class CustomerSnapshot implements Serializable {
+public final class CustomerSnapshot implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final String name;
@@ -16,34 +16,25 @@ final class CustomerSnapshot implements Serializable {
     private final List<AccountSnapshot> accounts;
     private final List<RecurringPaymentSnapshot> recurringPayments;
 
-    CustomerSnapshot(Customer customer) {
+    public CustomerSnapshot(Customer customer) {
+        CustomerCredentials credentials = customer.getCredentials();
         this.name = customer.getName();
         this.address = customer.getAddress();
         this.phoneNumber = customer.getPhoneNumber();
         this.email = customer.getEmail();
-        this.password = customer.getStoredPassword();
-        this.pin = customer.getStoredPin();
+        this.password = credentials.getStoredPassword();
+        this.pin = credentials.getStoredPin();
         this.accounts = toAccountSnapshots(customer.getAccounts());
         this.recurringPayments = toPaymentSnapshots(customer.getRecurringPayments());
     }
 
-    Customer toCustomer() {
-        Customer customer = new Customer(name, toAccounts());
-        restoreProfile(customer);
-        restoreRecurringPayments(customer);
-        return customer;
-    }
-
-    private void restoreProfile(Customer customer) {
-        customer.restorePersonalInformation(address, phoneNumber, email);
-        customer.restorePassword(password);
-        customer.restorePin(pin);
-    }
-
-    private void restoreRecurringPayments(Customer customer) {
-        for (RecurringPaymentSnapshot payment : recurringPayments) {
-            customer.restoreRecurringPayment(payment.toRecurringPayment());
-        }
+    public Customer toCustomer() {
+        return new Customer(
+                new CustomerProfile(name, address, phoneNumber, email),
+                new CustomerCredentials(password, pin),
+                toAccounts(),
+                toRecurringPayments()
+        );
     }
 
     private List<AccountSnapshot> toAccountSnapshots(List<BankAccount> source) {
@@ -68,6 +59,14 @@ final class CustomerSnapshot implements Serializable {
         List<BankAccount> restored = new ArrayList<BankAccount>();
         for (AccountSnapshot account : accounts) {
             restored.add(account.toAccount());
+        }
+        return restored;
+    }
+
+    private List<RecurringPayment> toRecurringPayments() {
+        List<RecurringPayment> restored = new ArrayList<RecurringPayment>();
+        for (RecurringPaymentSnapshot payment : recurringPayments) {
+            restored.add(payment.toRecurringPayment());
         }
         return restored;
     }

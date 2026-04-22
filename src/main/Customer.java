@@ -1,72 +1,73 @@
 package main;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.time.LocalDate;
 
 public class Customer implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final String name;
+    private final CustomerProfile profile;
+    private final CustomerCredentials credentials;
     private final ArrayList<BankAccount> accounts;
     private final ArrayList<RecurringPayment> recurringPayments;
-    private String address;
-    private String phoneNumber;
-    private String email;
-    private String password;
-    private String pin;
 
     public Customer(String name) {
-        this.name = name;
-        this.accounts = new ArrayList<>();
-        this.recurringPayments = new ArrayList<>();
-        openAccount();
+        this(new CustomerProfile(name), new CustomerCredentials(), null, null, true);
     }
 
     public Customer(String name, BankAccount account) {
-        this.name = name;
-        this.accounts = new ArrayList<>();
-        this.recurringPayments = new ArrayList<>();
+        this(new CustomerProfile(name), new CustomerCredentials(), null, null, false);
         openAccount(account);
     }
 
     public Customer(String name, List<BankAccount> accounts) {
-        this.name = name;
+        this(new CustomerProfile(name), new CustomerCredentials(), accounts, null, true);
+    }
+
+    Customer(CustomerProfile profile, CustomerCredentials credentials,
+             List<BankAccount> accounts, List<RecurringPayment> recurringPayments) {
+        this(profile, credentials, accounts, recurringPayments, true);
+    }
+
+    private Customer(CustomerProfile profile, CustomerCredentials credentials,
+                     List<BankAccount> accounts, List<RecurringPayment> recurringPayments,
+                     boolean createDefaultAccount) {
+        this.profile = profile;
+        this.credentials = credentials;
         this.accounts = new ArrayList<>();
         this.recurringPayments = new ArrayList<>();
-        if (accounts == null || accounts.isEmpty()) {
-            openAccount();
-            return;
+        if (accounts != null) {
+            this.accounts.addAll(accounts);
         }
-        for (BankAccount account : accounts) {
-            openAccount(account);
+        if (recurringPayments != null) {
+            this.recurringPayments.addAll(recurringPayments);
+        }
+        if (createDefaultAccount && this.accounts.isEmpty()) {
+            this.accounts.add(new BankAccount());
         }
     }
 
     public String getName() {
-        return this.name;
+        return profile.getName();
     }
 
     public String getAddress() {
-        return this.address;
+        return profile.getAddress();
     }
 
     public String getPhoneNumber() {
-        return this.phoneNumber;
+        return profile.getPhoneNumber();
     }
 
     public String getEmail() {
-        return this.email;
+        return profile.getEmail();
     }
 
-    String getStoredPassword() {
-        return this.password;
-    }
-
-    String getStoredPin() {
-        return this.pin;
+    CustomerCredentials getCredentials() {
+        return credentials;
     }
 
     public List<BankAccount> getAccounts() {
@@ -74,53 +75,23 @@ public class Customer implements Serializable {
     }
 
     public void updatePersonalInformation(String address, String phoneNumber, String email) {
-        validatePersonalInfo(address, "Address");
-        validatePersonalInfo(phoneNumber, "Phone number");
-        validatePersonalInfo(email, "Email");
-
-        this.address = address;
-        this.phoneNumber = phoneNumber;
-        this.email = email;
+        profile.updatePersonalInformation(address, phoneNumber, email);
     }
 
     public void setPassword(String password) {
-        validatePersonalInfo(password, "Password");
-        this.password = password;
+        credentials.setPassword(password);
     }
 
     public void setPin(String pin) {
-        if (pin == null || !pin.matches("\\d{4}")) {
-            throw new IllegalArgumentException("PIN must be exactly 4 digits.");
-        }
-        this.pin = pin;
+        credentials.setPin(pin);
     }
 
     public boolean verifyPassword(String password) {
-        if (this.password == null) {
-            return false;
-        }
-        return this.password.equals(password);
+        return credentials.verifyPassword(password);
     }
 
     public boolean verifyPin(String pin) {
-        if (this.pin == null) {
-            return false;
-        }
-        return this.pin.equals(pin);
-    }
-
-    void restorePersonalInformation(String address, String phoneNumber, String email) {
-        this.address = address;
-        this.phoneNumber = phoneNumber;
-        this.email = email;
-    }
-
-    void restorePassword(String password) {
-        this.password = password;
-    }
-
-    void restorePin(String pin) {
-        this.pin = pin;
+        return credentials.verifyPin(pin);
     }
 
     public BankAccount openAccount() {
@@ -143,6 +114,13 @@ public class Customer implements Serializable {
         if (account.getBalance() != 0) {
             throw new IllegalStateException("Cannot close account with non-zero balance.");
         }
+        if (!account.getRemainingFees().isEmpty()) {
+            throw new IllegalStateException("Cannot close account with unpaid fees.");
+        }
+        // Recurring payments store account indices, so closing any account would invalidate them.
+        if (!recurringPayments.isEmpty()) {
+            throw new IllegalStateException("Cannot close account while recurring payments are active.");
+        }
         this.accounts.remove(account);
     }
 
@@ -162,13 +140,6 @@ public class Customer implements Serializable {
 
     public List<RecurringPayment> getRecurringPayments() {
         return Collections.unmodifiableList(recurringPayments);
-    }
-
-    void restoreRecurringPayment(RecurringPayment payment) {
-        if (payment == null) {
-            throw new IllegalArgumentException("Recurring payment cannot be null.");
-        }
-        recurringPayments.add(payment);
     }
 
     public int processRecurringPayments() {
@@ -194,12 +165,6 @@ public class Customer implements Serializable {
     private void validateRecurringPaymentAccountIndex(int accountIndex, String label) {
         if (accountIndex < 0 || accountIndex >= accounts.size()) {
             throw new IllegalArgumentException(label + " account selection is invalid.");
-        }
-    }
-
-    private void validatePersonalInfo(String value, String fieldName) {
-        if (value == null || value.trim().isEmpty()) {
-            throw new IllegalArgumentException(fieldName + " cannot be empty.");
         }
     }
 }
