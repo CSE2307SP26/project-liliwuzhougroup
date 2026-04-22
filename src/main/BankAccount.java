@@ -13,6 +13,7 @@ public class BankAccount implements Serializable {
     private ArrayList<Fee> fees;
     private boolean frozen;
     private double maxWithdrawAmount;
+    private double lowBalanceThreshold;
 
     public BankAccount() {
         this.balance = 0;
@@ -20,6 +21,7 @@ public class BankAccount implements Serializable {
         this.fees = new ArrayList<>();
         this.frozen = false;
         this.maxWithdrawAmount = Double.MAX_VALUE;
+        this.lowBalanceThreshold = 0;
     }
 
     public BankAccount(double balance, String transactionHistory) {
@@ -28,6 +30,7 @@ public class BankAccount implements Serializable {
         this.fees = new ArrayList<>();
         this.frozen = false;
         this.maxWithdrawAmount = Double.MAX_VALUE;
+        this.lowBalanceThreshold = 0;
     }
 
     public BankAccount(double balance, String transactionHistory, boolean frozen) {
@@ -36,6 +39,7 @@ public class BankAccount implements Serializable {
         this.fees = new ArrayList<>();
         this.frozen = frozen;
         this.maxWithdrawAmount = Double.MAX_VALUE;
+        this.lowBalanceThreshold = 0;
     }
 
     public BankAccount(double balance, String transactionHistory, boolean frozen, double maxWithdrawAmount) {
@@ -44,6 +48,7 @@ public class BankAccount implements Serializable {
         this.fees = new ArrayList<>();
         this.frozen = frozen;
         this.maxWithdrawAmount = maxWithdrawAmount <= 0 ? Double.MAX_VALUE : maxWithdrawAmount;
+        this.lowBalanceThreshold = 0;
     }
 
     public BankAccount(double balance, String transactionHistory, double maxWithdrawAmount) {
@@ -56,6 +61,7 @@ public class BankAccount implements Serializable {
         } else {
             this.maxWithdrawAmount = maxWithdrawAmount;
         }
+        this.lowBalanceThreshold = 0;
     }
 
     public void deposit(double amount) {
@@ -195,6 +201,22 @@ public class BankAccount implements Serializable {
     public List<Fee> getRemainingFees() {
         return new ArrayList<>(this.fees);
     }
+
+    public double getLowBalanceThreshold() {
+        return this.lowBalanceThreshold;
+    }
+
+    public void setLowBalanceThreshold(double threshold) {
+        if (threshold < 0) {
+            throw new IllegalArgumentException("Low balance threshold cannot be negative.");
+        }
+        this.lowBalanceThreshold = threshold;
+    }
+
+    public boolean wouldTriggerLowBalanceWarning(double amount) {
+        return lowBalanceThreshold > 0 && (balance - amount) < lowBalanceThreshold;
+    }
+
     private void ensureAccountIsActive() {
         if (this.frozen) {
             throw new IllegalStateException("This account is frozen. Transactions are not allowed.");

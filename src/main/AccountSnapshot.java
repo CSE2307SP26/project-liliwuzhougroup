@@ -12,6 +12,7 @@ final class AccountSnapshot implements Serializable {
     private final boolean frozen;
     private final double maxWithdrawAmount;
     private final List<FeeSnapshot> fees;
+    private final double lowBalanceThreshold;
 
     AccountSnapshot(BankAccount account) {
         this.balance = account.getBalance();
@@ -19,6 +20,7 @@ final class AccountSnapshot implements Serializable {
         this.frozen = account.isFrozen();
         this.maxWithdrawAmount = account.getMaxWithdrawAmount();
         this.fees = toFeeSnapshots(account.getRemainingFees());
+        this.lowBalanceThreshold = account.getLowBalanceThreshold();
     }
 
     BankAccount toAccount() {
@@ -29,6 +31,9 @@ final class AccountSnapshot implements Serializable {
                 maxWithdrawAmount
         );
         restoreFees(account);
+        if (lowBalanceThreshold > 0) {
+            account.setLowBalanceThreshold(lowBalanceThreshold);
+        }
         return account;
     }
 

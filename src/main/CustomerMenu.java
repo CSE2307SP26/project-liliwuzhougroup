@@ -6,8 +6,8 @@ import java.util.Scanner;
 public class CustomerMenu {
 
     private static final int DASHBOARD_OPTION_COUNT = 5;
-    private static final int ACCOUNT_MENU_EXIT_SELECTION = 9;
-    private static final int ACCOUNT_MENU_MAX_SELECTION = 9;
+    private static final int ACCOUNT_MENU_EXIT_SELECTION = 10;
+    private static final int ACCOUNT_MENU_MAX_SELECTION = 10;
 
     protected final Scanner keyboardInput;
     protected final Bank bank;
@@ -108,6 +108,10 @@ public class CustomerMenu {
 
     public void performWithdrawal(BankAccount account) {
         double withdrawAmount = io.readPositiveAmount("How much would you like to withdraw: ");
+        if (!new LowBalanceWarning(keyboardInput).confirmIfNeeded(account, withdrawAmount)) {
+            System.out.println("Withdrawal cancelled.");
+            return;
+        }
         try {
             account.withdraw(withdrawAmount);
             System.out.println("Withdrawal successful.");
@@ -175,7 +179,10 @@ public class CustomerMenu {
             targetAccount = accountSelector.selectAccount(customer, "transfer money to");
         }
         double amount = io.readPositiveAmount("How much would you like to transfer: ");
-
+        if (!new LowBalanceWarning(keyboardInput).confirmIfNeeded(sourceAccount, amount)) {
+            System.out.println("Transfer cancelled.");
+            return;
+        }
         try {
             sourceAccount.transferMoney(targetAccount, amount);
             System.out.println("Transfer successful.");
@@ -219,6 +226,10 @@ public class CustomerMenu {
         } catch (IllegalArgumentException | IllegalStateException e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    public void setLowBalanceThreshold(BankAccount account) {
+        new LowBalanceWarning(keyboardInput).setThreshold(account);
     }
 
     public void manageRecurringPayments() {
@@ -271,8 +282,9 @@ public class CustomerMenu {
         System.out.println("5. Transfer money from this account");
         System.out.println("6. Set maximum withdrawal amount");
         System.out.println("7. Pay a pending fee");
-        System.out.println("8. Close this account");
-        System.out.println("9. Back to account dashboard");
+        System.out.println("8. Set low balance threshold");
+        System.out.println("9. Close this account");
+        System.out.println("10. Back to account dashboard");
     }
 
     private boolean processAccountSelection(BankAccount account, int selection) {
@@ -284,7 +296,8 @@ public class CustomerMenu {
             case 5: transferBetweenAccounts(account); return false;
             case 6: setMaximumWithdrawalAmount(account); return false;
             case 7: payPendingFee(account); return false;
-            case 8:
+            case 8: setLowBalanceThreshold(account); return false;
+            case 9:
                 closeExistingAccount(account);
                 return !customer.getAccounts().contains(account);
             case ACCOUNT_MENU_EXIT_SELECTION:

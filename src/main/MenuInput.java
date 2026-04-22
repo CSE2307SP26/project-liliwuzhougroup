@@ -38,6 +38,19 @@ final class MenuInput {
         return amount;
     }
 
+    double readNonNegativeAmount(String prompt) {
+        double amount = -1;
+        while (amount < 0) {
+            System.out.print(prompt);
+            if (keyboardInput.hasNextDouble()) {
+                amount = keyboardInput.nextDouble();
+            } else {
+                keyboardInput.next();
+            }
+        }
+        return amount;
+    }
+
     void prepareForTextInput() {
         keyboardInput.skip("\\R?");
     }
