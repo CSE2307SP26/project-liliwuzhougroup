@@ -1,5 +1,6 @@
-package main;
+package test;
 
+import main.*;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -14,7 +15,7 @@ public class CustomerRegistrationServiceTest {
         CustomerRegistrationRequest request = new CustomerRegistrationRequest(
                 "Ava Doe",
                 "12 River Rd",
-                "5551112222",
+                "(555) 111-2222",
                 "ava@test.com",
                 "password123",
                 "1234"
@@ -30,6 +31,26 @@ public class CustomerRegistrationServiceTest {
         assertTrue(customer.verifyPassword("password123"));
         assertTrue(customer.verifyPin("1234"));
         assertEquals(1, customer.getAccounts().size());
+    }
+
+    @Test
+    public void testRegisterRejectsInvalidPhoneNumber() {
+        Bank bank = new Bank();
+        CustomerRegistrationRequest request = new CustomerRegistrationRequest(
+                "Ava Doe",
+                "12 River Rd",
+                "555-2222",
+                "ava@test.com",
+                "password123",
+                null
+        );
+
+        try {
+            new CustomerRegistrationService(bank).register(request);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Phone number must contain exactly 10 digits.", e.getMessage());
+        }
     }
 
     @Test

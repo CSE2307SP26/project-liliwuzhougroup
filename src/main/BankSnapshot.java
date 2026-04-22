@@ -4,16 +4,16 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-final class BankSnapshot implements Serializable {
+public final class BankSnapshot implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final List<CustomerSnapshot> customers;
 
-    BankSnapshot(Bank bank) {
+    public BankSnapshot(Bank bank) {
         this.customers = toCustomerSnapshots(bank.getCustomers());
     }
 
-    Bank toBank() {
+    public Bank toBank() {
         Bank bank = new Bank();
         for (CustomerSnapshot customer : customers) {
             bank.addCustomer(customer.toCustomer());

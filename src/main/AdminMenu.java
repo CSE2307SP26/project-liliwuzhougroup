@@ -9,8 +9,11 @@ import java.util.Scanner;
 
 public class AdminMenu extends CustomerMenu {
 
-    private static final int ADMIN_EXIT_SELECTION = 16;
-    private static final int ADMIN_MAX_SELECTION = 16;
+    private static final int VIEW_SPECIFIC_ACCOUNT_HISTORY_SELECTION = 15;
+    private static final int VIEW_ALL_ACCOUNT_HISTORY_SELECTION = 16;
+    private static final int ADMIN_BACK_SELECTION = 17;
+    private static final int ADMIN_EXIT_SELECTION = 18;
+    private static final int ADMIN_MAX_SELECTION = 18;
 
     public AdminMenu(Bank bank, Customer customer) {
         this(bank, new Scanner(System.in), customer);
@@ -33,7 +36,7 @@ public class AdminMenu extends CustomerMenu {
     @Override
     public void run() {
         int selection = -1;
-        while (selection != ADMIN_EXIT_SELECTION) {
+        while (selection != ADMIN_BACK_SELECTION) {
             displayOptions();
             selection = io.readSelection(ADMIN_MAX_SELECTION);
             processInput(selection);
@@ -42,6 +45,7 @@ public class AdminMenu extends CustomerMenu {
 
     @Override
     public void displayOptions() {
+        MenuScreen.redraw();
         System.out.println("Admin Menu:");
         System.out.println("1. Customer: Make a deposit");
         System.out.println("2. Customer: Make a withdrawal");
@@ -57,15 +61,21 @@ public class AdminMenu extends CustomerMenu {
         System.out.println("12. Customer: Set maximum withdrawal amount");
         System.out.println("13. Customer: Manage recurring payments");
         System.out.println("14. Admin: Create pending fee");
-        System.out.println("15. Admin: View all account history");
-        System.out.println("16. Back to main menu");
+        System.out.println("15. Admin: View a specific account history");
+        System.out.println("16. Admin: View all account history");
+        System.out.println("17. Back to main menu");
+        System.out.println("18. Exit the app");
     }
 
     @Override
     public void processInput(int selection) {
         try {
-            if (selection == ADMIN_EXIT_SELECTION) {
+            if (selection == ADMIN_BACK_SELECTION) {
                 System.out.println("Leaving admin menu.");
+                return;
+            }
+            if (selection == ADMIN_EXIT_SELECTION) {
+                MainMenu.requestExit();
                 return;
             }
             if (processCustomerSelection(selection)) {
@@ -120,6 +130,13 @@ public class AdminMenu extends CustomerMenu {
         return bank.getAllCustomersHistory();
     }
 
+    public void displaySelectedAccountHistory() {
+        BankAccount account = selectAnyCustomerAccount("view transaction history for");
+        System.out.println("Transaction History:");
+        String history = account.getTransactionHistory();
+        System.out.println(history.isEmpty() ? "No transactions yet." : history);
+    }
+
     public void displayAllCustomersHistory() {
         String allHistory = getAllCustomersHistory();
         System.out.println(allHistory.isEmpty() ? "No history available." : allHistory);
@@ -147,7 +164,8 @@ public class AdminMenu extends CustomerMenu {
             case 10: freezeAccount(); return true;
             case 11: unfreezeAccount(); return true;
             case 14: createPendingFee(); return true;
-            case 15: displayAllCustomersHistory(); return true;
+            case VIEW_SPECIFIC_ACCOUNT_HISTORY_SELECTION: displaySelectedAccountHistory(); return true;
+            case VIEW_ALL_ACCOUNT_HISTORY_SELECTION: displayAllCustomersHistory(); return true;
             default: return false;
         }
     }

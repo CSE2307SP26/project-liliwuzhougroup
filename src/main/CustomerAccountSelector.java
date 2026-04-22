@@ -2,14 +2,14 @@ package main;
 
 import java.util.List;
 
-final class CustomerAccountSelector {
+public final class CustomerAccountSelector {
     private final MenuInput io;
 
-    CustomerAccountSelector(MenuInput io) {
+    public CustomerAccountSelector(MenuInput io) {
         this.io = io;
     }
 
-    BankAccount selectAccount(Customer customer, String action) {
+    public BankAccount selectAccount(Customer customer, String action) {
         List<BankAccount> accounts = customer.getAccounts();
         if (accounts.isEmpty()) {
             throw new IllegalStateException("No accounts available to " + action + ".");
@@ -28,7 +28,7 @@ final class CustomerAccountSelector {
             System.out.println((i + 1) + ". Account #" + (i + 1)
                     + " (Balance: " + account.getBalance()
                     + ", Status: " + status
-                    + ", Max Withdraw: " + account.getMaxWithdrawAmount() + ")");
+                    + ", Max Withdraw: " + account.getDisplayMaxWithdrawAmount() + ")");
         }
     }
 

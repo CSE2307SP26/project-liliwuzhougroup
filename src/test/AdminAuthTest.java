@@ -17,4 +17,9 @@ public class AdminAuthTest {
     public void testInvalidPassword() {
         assertFalse(AdminAuth.isValidPassword("wrong"));
     }
+
+    @Test
+    public void testNullPasswordIsRejected() {
+        assertFalse(AdminAuth.isValidPassword(null));
+    }
 }

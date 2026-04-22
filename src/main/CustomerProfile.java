@@ -2,7 +2,7 @@ package main;
 
 import java.io.Serializable;
 
-final class CustomerProfile implements Serializable {
+public final class CustomerProfile implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final String name;
@@ -10,36 +10,36 @@ final class CustomerProfile implements Serializable {
     private String phoneNumber;
     private String email;
 
-    CustomerProfile(String name) {
+    public CustomerProfile(String name) {
         this.name = requireValue(name, "Name");
     }
 
-    CustomerProfile(String name, String address, String phoneNumber, String email) {
+    public CustomerProfile(String name, String address, String phoneNumber, String email) {
         this(name);
         this.address = address;
-        this.phoneNumber = phoneNumber;
+        this.phoneNumber = PhoneNumberFormatter.normalizeOptional(phoneNumber);
         this.email = email;
     }
 
-    String getName() {
+    public String getName() {
         return name;
     }
 
-    String getAddress() {
+    public String getAddress() {
         return address;
     }
 
-    String getPhoneNumber() {
+    public String getPhoneNumber() {
         return phoneNumber;
     }
 
-    String getEmail() {
+    public String getEmail() {
         return email;
     }
 
-    void updatePersonalInformation(String address, String phoneNumber, String email) {
+    public void updatePersonalInformation(String address, String phoneNumber, String email) {
         this.address = requireValue(address, "Address");
-        this.phoneNumber = requireValue(phoneNumber, "Phone number");
+        this.phoneNumber = PhoneNumberFormatter.normalizeRequired(phoneNumber);
         this.email = requireValue(email, "Email");
     }
 

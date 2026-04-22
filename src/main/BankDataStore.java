@@ -14,14 +14,20 @@ public final class BankDataStore {
     }
 
     public static Bank loadBank() {
-        return loadBank(new File(DATA_FILE));
+        return loadBank(new File(DATA_FILE), true);
     }
 
     public static Bank loadBank(File file) {
+        return loadBank(file, false);
+    }
+
+    public static Bank loadBank(File file, boolean ensureSampleCustomer) {
         if (file == null || !file.exists()) {
-            return new Bank();
+            Bank bank = new Bank();
+            return ensureSampleCustomer ? SampleBankFactory.ensureSampleCustomer(bank) : bank;
         }
-        return readBank(file);
+        Bank bank = readBank(file);
+        return ensureSampleCustomer ? SampleBankFactory.ensureSampleCustomer(bank) : bank;
     }
 
     public static void saveBank(Bank bank) {
