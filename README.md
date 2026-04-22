@@ -26,6 +26,8 @@
 15. A bank costumer should be able to set a maximum withdraw amount for their account
 16. A bank customer should be able to set a password or PIN for account security.
 17. A bank customer should be able to update their personal information.
+18. A bank administrator should be able to create a pending fee for a customer account.
+19.  A bank customer should be able to pay a pending fee from an existing account.
 
 ## What user stories were completed in this iteration?
 * In this iteration, we completed several user stories related to both customer and administrator functions. A bank administrator can now log in as an administrator, view all transactions for a particular account, and freeze or unfreeze a customer account. On the customer side, users can now receive notifications before a fee is due, set up an auto recurring payment to an account, set a maximum withdrawal amount, create a password or PIN for account security, and update their personal information.
@@ -42,7 +44,8 @@ In the next iteration, we plan to improve and expand the current banking feature
 6. A bank costumer should be able to set a maximum withdraw amount for their account
 7. A bank customer should be able to set a password or PIN for account security.
 8. A bank customer should be able to update their personal information.
-
+9. A bank administrator should be able to create a pending fee for a customer account.
+10. A bank customer should be able to pay a pending fee from an existing account.
 
 ## Is there anything that you implemented but doesn't currently work?
 * At this point, the main features listed above have been implemented. Some parts may still need further testing, integration, or refinement to make sure they work smoothly in all cases, but no major intended feature is completely unfinished.
